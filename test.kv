@@ -1,0 +1,133 @@
+#:kivy 1.0
+#:import kivy kivy
+
+<RecycleItemButton>:
+    on_release: root.remove()
+
+
+<MainScreen>:
+    canvas.before:
+        Color:
+            rgba: app.theme.background
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'vertical'
+        Header:
+            id: header
+            NormalLabel:
+                text: 'test app'
+            InfoLabel:
+            SettingsButton:
+        MainArea:
+            id: mainArea
+            Scroller:
+                BoxLayout:
+                    padding: app.button_scale / 2, 0
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                    Holder:
+                        WideButton:
+                            text: "Load Theme 1"
+                            on_release: app.load_theme(1)
+                        WideButton:
+                            text: "Load Theme 2"
+                            on_release: app.load_theme(2)
+                    SmallSpacer:
+                    Holder:
+                        NormalMenuStarter:
+                            text: 'Small Menu'
+                            on_release: root.menu.open(self)
+                        WideMenuStarter:
+                            text: 'Wide Menu'
+                            on_release: root.menu.open(self)
+                    SmallSpacer:
+                    Holder:
+                        NormalToggle:
+                            text: 'Toggle Button'
+                            on_release: app.message('Toggled To: '+self.state)
+                        WideToggle:
+                            text: 'Wide Toggle Button'
+                            on_release: app.message('Toggled To: '+self.state)
+                    SmallSpacer:
+                    Holder:
+                        NormalButton:
+                            text: 'Small Button'
+                            on_release: app.message('Small Button Message')
+                        WideButton:
+                            text: 'Wide Button'
+                            on_release: app.message('Wide Button Message')
+                    SmallSpacer:
+                    WideButton:
+                        text: 'Warning Button'
+                        warn: True
+                    SmallSpacer:
+                    WideButton:
+                        text: 'Disabled Button'
+                        disabled: True
+
+                    LargeSpacer:
+                    Holder:
+                        ShortLabel:
+                            text: "Normal Input: "
+                        NormalInput:
+                    SmallSpacer:
+                    Holder:
+                        ShortLabel:
+                            text: "Integer Input: "
+                        IntegerInput:
+                    SmallSpacer:
+                    Holder:
+                        ShortLabel:
+                            text: "Float Input: "
+                        FloatInput:
+
+                    LargeSpacer:
+                    NormalLabel:
+                        text: 'RecycleViews: '
+                    BoxLayout:
+                        size_hint_y: None
+                        height: 200
+                        orientation: 'horizontal'
+                        NormalRecycleView:
+                            data: root.recycle_data_1
+                            viewclass: 'RecycleItemButton'
+                            SelectableRecycleGridLayout:
+                                default_size: None, app.button_scale
+                                default_size_hint: 1, None
+                                orientation: 'vertical'
+                                size_hint_x: 1
+                                size_hint_y: None
+                                height: self.minimum_height
+                        NormalRecycleView:
+                            data: root.recycle_data_2
+                            viewclass: 'RecycleItemLabel'
+                            SelectableRecycleBoxLayout:
+                                multiselect: True
+                                default_size: None, app.button_scale
+                                default_size_hint: 1, None
+                                orientation: 'vertical'
+                                size_hint_x: 1
+                                size_hint_y: None
+                                height: self.minimum_height
+                    LargeSpacer:
+                    Holder:
+                        ShortLabel:
+                            text: "Slider: "
+                        NormalSlider:
+
+                    LargeSpacer:
+
+
+            Holder:
+                WideButton:
+                    text: 'Show Popup Message'
+                    on_release: app.message_popup('Popup Window Message')
+                WideButton:
+                    text: 'Show Popup Question'
+                    on_release: root.question_popup()
+                WideButton:
+                    text: 'Show Popup Input'
+                    on_release: root.input_popup()
