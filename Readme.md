@@ -1,4 +1,4 @@
-#General Info
+# General Info
 Snu Kivy Template is a collection of classes and widgets that make it easier to create theme-able, clean, and a bit flashy apps in Kivy.  Please note that this depends entirely on Kivy, and will not be usable without Kivy installed first.  
 
 This is a gift to the Kivy community, a culmination of what I have learned over the years when developing several kivy-based apps.  Use these classes as a basis for your own, or just use them directly, I impose no limitations on the code or images enclosed in this archive.
