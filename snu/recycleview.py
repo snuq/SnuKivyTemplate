@@ -141,11 +141,13 @@ class SelectableRecycleLayout(LayoutSelectionBehavior):
 
     def select_all(self):
         self.selects = []
+        selects = []
         for data in self.parent.data:
             if data['selectable']:
                 data['selected'] = True
-                self.selects.append(data)
-                self.selected = data
+                selects.append(data)
+        self.selects = selects
+        self.selected = selects[-1]
         self.refresh_selection()
 
     def select_node(self, node):
