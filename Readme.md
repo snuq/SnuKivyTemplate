@@ -251,6 +251,12 @@ All text inputs default to being the standard button height, and are themed base
 ## snu.textinput.NormalInput
 Themed TextInput with some standard convenience settings.  No limitations on text to be entered, implements a right-click/long-press context menu for standard clipboard operations.  
 
+* ### NormalInput.press_enter(String)
+This function is called when the 'Enter' key is pressed in the text input field.  This function will be passed the textinput widget, and the current text in the widget.   You can overwrite the function in your own subclass, or bind it to another function like so:
+
+    NormalInput:
+        press_enter: root.search
+
 ## snu.textinput.FloatInput
 Themed TextInput widget that limits inputted text to only numbers and a single period.
 
