@@ -238,6 +238,14 @@ For example, in kvlang:
 Themed slider based on SpecialSlider.  Uses colors from the theme and the sliderbg image from the data directory.
 
 
+# snu.songplayer Classes
+
+## snu.songplayer.SongPlayer
+Class based on kivy's kivy.uix.videoplayer.VideoPlayer class, but meant for playing audio.  Includes a stop, play/pause, volume buttons, and a slider for displaying and seeking the song position.  Most variables and functions that make sense are ported over from the VideoPlayer, see kivy's documentation for more information on these.  
+* Variables for setting, seeing the song: source, duration, position, volume, state  
+* Variables for theme: image_play, image_stop, image_pause, image_volumehigh, image_volumemedium, image_volumelow, image_volumemuted  
+* Functions: seek()
+
 # snu.stencilview Classes
 
 ## snu.stencilview.StencilViewTouch
