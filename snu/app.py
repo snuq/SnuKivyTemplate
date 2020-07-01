@@ -125,6 +125,11 @@ class NormalApp(App):
     last_height = NumericProperty(0)
     last_width = NumericProperty(0)
     bubble = ObjectProperty(allownone=True)
+    button_divisors = NumericProperty(15)
+    window_top = NumericProperty(0)
+    window_left = NumericProperty(0)
+    window_width = NumericProperty(800)
+    window_height = NumericProperty(600)
 
     clickfade_object = ObjectProperty()
     infotext = StringProperty('')
@@ -172,8 +177,33 @@ class NormalApp(App):
                 setattr(theme, color, new_color)
         self.button_update = not self.button_update
 
+    def set_window_size(self, load=True):
+        if load:
+            self.load_window_size()
+        Window.left = self.window_left
+        Window.top = self.window_top
+        Window.size = (self.window_width, self.window_height)
+
+    def load_window_size(self):
+        self.window_top = int(self.config.get('Settings', 'window_top'))
+        self.window_left = int(self.config.get('Settings', 'window_left'))
+        self.window_height = int(self.config.get('Settings', 'window_height'))
+        self.window_width = int(self.config.get('Settings', 'window_width'))
+
+    def store_window_size(self):
+        self.window_top = Window.top
+        self.window_left = Window.left
+        self.window_width = Window.size[0]
+        self.window_height = Window.size[1]
+        self.config.set('Settings', 'window_top', self.window_top)
+        self.config.set('Settings', 'window_left', self.window_left)
+        self.config.set('Settings', 'window_width', self.window_width)
+        self.config.set('Settings', 'window_height', self.window_height)
+
     def rescale_interface(self, *_, force=False):
         """Called when the window changes resolution, calculates variables dependent on screen size"""
+
+        self.store_window_size()
 
         if Window.width != self.last_width:
             self.last_width = Window.width
@@ -181,7 +211,7 @@ class NormalApp(App):
 
         if (Window.height != self.last_height) or force:
             self.last_height = Window.height
-            self.button_scale = int((Window.height / 15) * int(self.config.get("Settings", "buttonsize")) / 100)
+            self.button_scale = int((Window.height / self.button_divisors) * int(self.config.get("Settings", "buttonsize")) / 100)
             self.text_scale = int((self.button_scale / 3) * int(self.config.get("Settings", "textsize")) / 100)
             self.display_border = self.button_scale / 3
             self.display_padding = self.button_scale / 4
@@ -248,6 +278,10 @@ class NormalApp(App):
             'Settings', {
                 'buttonsize': 100,
                 'textsize': 100,
+                'window_top': 0,
+                'window_left': 0,
+                'window_width': 800,
+                'window_height': 600,
             })
 
     def build_settings(self, settings):

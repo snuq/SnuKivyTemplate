@@ -78,6 +78,7 @@ class Test(NormalApp):
     def on_start(self):
         """Called when the app is started, after kv files are loaded"""
 
+        self.set_window_size()
         self.load_theme(1)
         EventLoop.window.bind(on_keyboard=self.hook_keyboard)
 
