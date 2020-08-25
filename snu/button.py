@@ -34,6 +34,7 @@ Builder.load_string("""
         Rectangle:
             size: self.size
             pos: root.pos
+    background: 'data/transparent.png'
     size_hint: None, None
     opacity: 0
 

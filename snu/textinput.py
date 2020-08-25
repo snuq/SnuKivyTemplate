@@ -118,6 +118,8 @@ class NormalInput(TextInput):
         app.popup_bubble(self, self.long_press_pos)
 
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
+        app = App.get_running_app()
+        app.close_bubble()
         if keycode[0] == 13:
             self.press_enter(self, self.text)
         super().keyboard_on_key_down(window, keycode, text, modifiers)
@@ -126,7 +128,7 @@ class NormalInput(TextInput):
         pass
 
 
-class FloatInput(TextInput):
+class FloatInput(NormalInput):
     """Custom text input that only allows float numbers to be typed in.  Only allows numerals and one '.'"""
 
     pat = re.compile('[^0-9]')
@@ -140,7 +142,7 @@ class FloatInput(TextInput):
         return super(FloatInput, self).insert_text(s, from_undo=from_undo)
 
 
-class IntegerInput(TextInput):
+class IntegerInput(NormalInput):
     """Custom text input that only allows numbers to be typed in."""
 
     pat = re.compile('[^0-9]')
