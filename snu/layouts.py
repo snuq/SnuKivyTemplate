@@ -1,35 +1,37 @@
 from kivy.graphics.transformation import Matrix
 from kivy.properties import ObjectProperty, StringProperty, ListProperty, BooleanProperty, NumericProperty, DictProperty
 from kivy.uix.scatterlayout import ScatterLayout
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.widget import Widget
 from kivy.uix.stencilview import StencilView
 
 from kivy.lang.builder import Builder
 Builder.load_string("""
-<SmallSpacer@Widget>:
+<SmallSpacer>:
     size_hint: None, None
     height: int(app.button_scale / 4)
     width: int(app.button_scale / 4)
 
-<MediumSpacer@Widget>:
+<MediumSpacer>:
     size_hint: None, None
     height: int(app.button_scale / 2)
     width: int(app.button_scale / 2)
 
-<LargeSpacer@Widget>:
+<LargeSpacer>:
     size_hint: None, None
     height: app.button_scale
     width: app.button_scale
 
-<HeaderBase@BoxLayout>:
+<HeaderBase>:
     size_hint_y: None
     orientation: 'horizontal'
 
-<Holder@BoxLayout>:
+<Holder>:
     orientation: 'horizontal'
     size_hint_y: None
     height: app.button_scale
 
-<Header@HeaderBase>:
+<Header>:
     canvas.before:
         Color:
             rgba: app.theme.header_background
@@ -39,7 +41,7 @@ Builder.load_string("""
             source: 'data/headerbg.png'
     height: app.button_scale
 
-<MainArea@BoxLayout>:
+<MainArea>:
     canvas.before:
         Color:
             rgba: app.theme.main_background
@@ -50,6 +52,34 @@ Builder.load_string("""
     size_hint: 1, 1
     orientation: 'vertical'
 """)
+
+
+class SmallSpacer(Widget):
+    pass
+
+
+class MediumSpacer(Widget):
+    pass
+
+
+class LargeSpacer(Widget):
+    pass
+
+
+class HeaderBase(BoxLayout):
+    pass
+
+
+class Header(HeaderBase):
+    pass
+
+
+class Holder(BoxLayout):
+    pass
+
+
+class MainArea(BoxLayout):
+    pass
 
 
 class LimitedScatterLayout(ScatterLayout):
