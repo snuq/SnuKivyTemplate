@@ -107,7 +107,8 @@ class RecycleItem(RecycleDataViewBehavior):
         self.animation = None
         self.opacity = self.o_opacity
         self.pos = self.o_pos
-        self.parent.remove_node(self)
+        if self.parent:
+            self.parent.remove_node(self)
 
 
 class RecycleItemLabel(RecycleItem, NormalLabel):
