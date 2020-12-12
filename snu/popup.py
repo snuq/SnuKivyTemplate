@@ -6,7 +6,14 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.lang.builder import Builder
 Builder.load_string("""
 <NormalPopup>:
-    canvas.before:
+    background_color: app.theme.menu_background
+    background: 'data/panelbg.png'
+    separator_color: 1, 1, 1, .25
+    title_size: app.text_scale * 1.25
+    title_color: app.theme.header_text
+
+<NormalPopupPre2.0>:
+    canvas:
         Color:
             rgba: 0, 0, 0, .75 * self._anim_alpha
         Rectangle:
