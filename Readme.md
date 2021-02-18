@@ -274,6 +274,95 @@ For example, in kvlang:
 Themed slider based on SpecialSlider.  Uses colors from the theme and the sliderbg image from the data directory.
 
 
+
+# snu.filebrowser Classes
+
+## snu.filebrowser.FileBrowser
+A widget that displays a navigable file browser layout complete with a sidebar for system folders and shortcuts.  Two events are called, on_select and on_cancel when the user clicks the select and cancel buttons.  
+
+Due to the many different uses for a file browser, there are a lot of options available to control the behavior of this widget.  Unfortunately, some of these options can conflict with each other, so here are some examples.  
+The default settings are good for opening a single file, just use:
+
+    FileBrowser()
+
+To select a folder to export a pre-defined file, use:
+
+    FileBrowser(file_select=False, folder_select=True, show_files=False, show_filename=False)
+
+To let the user select a folder to export a file that they define, use (note that you should check the 'edited_selected' value, not 'selected'):  
+
+    FileBrowser(edit_filename=True, clear_filename=False, file_select=False, default_filename='default.txt')
+
+* ### FileBrowser.selected
+List Property.  This is the files or directories that the dialog selected.  Only the filename will be included, not the full path.  
+
+* ### FileBrowser.edited_selected
+String Property.  When edit_filename is enabled, and multi_select is disabled, this variable will be set to the text in the filename input field, allowing the user to provide a custom filename.  
+
+* ### FileBrowser.folder
+String Property.  This is the folder that the dialog is currently displaying.  Set this to start in a specific folder, and read it to find out what folder the user ended up in.  
+
+* ### FileBrowser.filetypes_filter
+List Property.  This is a list of extensions to display.  Set it to empty to display all files.  This expects standard wildcard style matches, such as:  
+
+    FileBrowser(filetypes_filter=['*.png', '*.jpg'])
+
+* ### FileBrowser.default_filename
+String Property.  When the widget is created, the filename field will be set to this value.  This can be used to display the filename that will be written, or to give the user a starting point for a filename.  
+
+* ### FileBrowser.file_select
+Boolean Property, defaults to True.  When this is True, the dialog can be used for selecting files.  Note that files will still be displayed by default, unless you hide them.  
+
+* ### FileBrowser.folder_select
+Boolean Property, defaults to False.  When this is True, the dialog can be used for selecting folders.  Keep in mind that this will not disable file_select, if you only want to select folders please disable that variable.  
+
+* ### FileBrowser.multi_select
+Boolean Property, defaults to False.  Setting this to True allows multiple files to be selected.  Clicking a file will toggle selection, and a range of files can be selected with shift-click.  Please note that only one folder may be selected, even if this is set to True.  
+
+* ### FileBrowser.show_files
+Boolean Property, defaults to True.  Display files in the browser.  Setting this to False will result in only folders being shown.  
+
+* ### FileBrowser.require_filename
+Boolean Property, defaults to True.  When this is True, the select button cannot be clicked if no file or folder is selected or provided.  
+
+* ### FileBrowser.edit_filename
+Boolean Property, defaults to False.  Setting this to True allows the user to enter a filename manually, or to edit existing filenames.  This can only be used when multi_select is disabled.  The edited filename will be stored in the variable 'edited_selected', be sure to check this if you wish to use the user's edit.  
+Be warned: enabling this may result in the 'selected' variable being empty, and only the 'edited_selected' variable containing a valid value.  
+
+* ### FileBrowser.clear_filename
+Boolean Property, defaults to True.  When this is True, the filename will be cleared when in file select mode and the folder is changed.  
+
+* ### FileBrowser.autoselect_files
+Boolean Property, defaults to False.  Setting this to True will cause all files to be selected in the folder when each folder is opened.  This variable only works when multi_select is enabled.  
+
+* ### FileBrowser.cancel_text
+String Property, defaults to 'Cancel'.  This is the text shown on the cancel button.  
+
+* ### FileBrowser.select_text
+String Property, defaults to 'Select'.  This is the text shown on the confirm or ok button.  
+
+* ### FileBrowser.shortcuts_size
+Numeric Property, defaults to 0.5.  This is the size_hint_x variable for the shortcuts area on the right side, also controls the width of the ok and cancel buttons.   
+ 
+* ### FileBrowser.show_cancel
+Boolean Property, defaults to True.  Setting this to False will hide the cancel button.  Hide this if you have a different method for canceling the file selection.  
+
+* ### FileBrowser.show_select
+Boolean Property, defaults to True.  Setting this to False will hide the ok button.  Hide this if you have a different way of confirming a file selection.  
+
+* ### FileBrowser.show_folder_edit
+Boolean Property, defaults to True.  Setting this to False will hide the new folder and delete folder buttons.  Hide these if you do not want the user to modify the folder structure.  
+
+* ### FileBrowser.show_filename
+Boolean Property, defaults to True.  Setting this to False will hide the selected filename field.  This may be useful to hide for export dialogs, or for folder selection dialogs.  
+
+
+* ### FileBrowser.
+Boolean Property, defaults to True.  Setting this to 
+
+
+
+
 # snu.songplayer Classes
 
 ## snu.songplayer.SongPlayer

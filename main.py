@@ -30,6 +30,26 @@ class MainScreen(Screen):
     recycle_data_1 = ListProperty()
     recycle_data_2 = ListProperty()
 
+    def filebrowser_popup(self):
+        if app.popup:
+            app.popup.dismiss()
+        content = FileBrowser()
+        #content = FileBrowser(file_select=False, folder_select=True, show_files=False, show_filename=False)
+        #content = FileBrowser(edit_filename=True, clear_filename=False, file_select=False, default_filename='default.txt')
+        content.bind(on_select=self.filebrowser_select)
+        content.bind(on_cancel=self.filebrowser_cancel)
+        app.popup = NormalPopup(title='Select A File', content=content, size_hint=(1, 1))
+        app.popup.open()
+
+    def filebrowser_select(self, browser):
+        app.message('Selected: '+';'.join(browser.selected))
+        #app.message('Selected: '+browser.edited_selected)
+        app.popup.dismiss()
+
+    def filebrowser_cancel(self, browser):
+        app.message('Cancelled file selection')
+        app.popup.dismiss()
+
     def input_popup(self):
         if app.popup:
             app.popup.dismiss()

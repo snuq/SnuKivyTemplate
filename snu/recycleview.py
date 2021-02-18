@@ -157,6 +157,8 @@ class SelectableRecycleLayout(LayoutSelectionBehavior):
             self.deselect_all()
         node.selected = True
         self.selects.append(node.data)
+        if node.data not in self.parent.data:
+            return
         self.parent.data[self.parent.data.index(node.data)]['selected'] = True
         node.data['selected'] = True
         self.selected = node.data
