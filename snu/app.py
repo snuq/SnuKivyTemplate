@@ -1,8 +1,10 @@
+import os
 import json
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
+from kivy.logger import Logger, LoggerHistory
 from kivy.properties import ListProperty, ObjectProperty, NumericProperty, StringProperty, BooleanProperty
 from .textinput import InputMenu
 from .popup import MessagePopupContent, NormalPopup

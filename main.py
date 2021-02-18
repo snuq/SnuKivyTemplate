@@ -8,6 +8,7 @@ from snu.scrollview import *
 from snu.slider import *
 from snu.stencilview import *
 from snu.textinput import *
+from snu.filebrowser import *
 from snu.recycleview import *
 from kivy.base import EventLoop
 from kivy.core.window import Window
@@ -156,5 +157,5 @@ if __name__ == '__main__':
         try:
             Test().save_crashlog()
         except:
-            pass
+            print(e)
         os._exit(-1)

@@ -201,11 +201,15 @@ class SelectableRecycleLayout(LayoutSelectionBehavior):
             if self.selects:
                 for select in self.selects:
                     if select['selectable']:
+                        if select not in self.parent.data:
+                            continue
                         index = self.parent.data.index(select)
                         if index != select_index:
                             selected_nodes.append(index)
             else:
                 selected_nodes = [0, len(self.parent.data)]
+            if not selected_nodes:
+                return
             closest_node = min(selected_nodes, key=lambda x: abs(x-select_index))
             for index in range(min(select_index, closest_node), max(select_index, closest_node)):
                 selected = self.parent.data[index]
