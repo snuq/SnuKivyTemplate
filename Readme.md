@@ -79,6 +79,31 @@ This can be used in the on_start function to recall the last saved window size:
         self.set_window_size()
 
 
+## Crashlog Saving
+A couple of helper functions to assist with saving logs for crashes are included.  
+To use these functions, you should wrap your main app loop in a try/except like so:
+
+    if __name__ == '__main__':
+        try:
+            MyApp().run()
+        except Exception as e:
+            try:
+                MyApp().save_crashlog()
+            except:
+                pass
+            os._exit(-1)
+
+Please note that by default, this will only save the most recent crash log, and you are responsible for providing the user a method to view/save this log.  
+
+* ### NormalApp.get_crashlog_file()
+This function will return the default file location for the crash log.  This should end up saved in the same folder as your app will save it's settings file.  
+You can use this function to return the file for saving where the user will have better access to it (or, for instance, to send via email).  
+Be warned that this file may not exist yet!
+
+* ### NormalApp.save_crashlog()
+This function should be called immediately after the app crashes, it and it will save the kivy log along with any traceback information with the filename returned by get_crashlog_file().  
+
+
 # snu.button Classes
 
 * ### Theme Colors
@@ -159,7 +184,7 @@ Special label that is filled with the app.infotext text, will also flash when th
 # snu.layouts Classes
 Special classes that help with layouting.
 
-## snu.layouts.SpallSpacer
+## snu.layouts.SmallSpacer
 Empty widget that is 1/4 the button size in both width and height.
 
 ## snu.layouts.MediumSpacer

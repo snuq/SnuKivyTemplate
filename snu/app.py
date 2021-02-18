@@ -142,6 +142,7 @@ class NormalApp(App):
         self.theme = Theme()
         self.load_theme(self.theme_index)
         Window.bind(on_draw=self.rescale_interface)
+
         super().__init__(**kwargs)
 
     def clickfade(self, widget, mode='opacity'):
@@ -315,3 +316,25 @@ class NormalApp(App):
         """Called when the configuration file is changed"""
 
         self.rescale_interface(force=True)
+
+    def get_crashlog_file(self):
+        """Returns the crashlog file path and name"""
+
+        savefolder_loc = os.path.split(self.get_application_config())[0]
+        crashlog = os.path.join(savefolder_loc, 'testapp_crashlog.txt')
+        return crashlog
+
+    def save_crashlog(self):
+        """Saves the just-generated crashlog to the current default location"""
+
+        import traceback
+        crashlog = self.get_crashlog_file()
+        log_history = reversed(LoggerHistory.history)
+        crashlog_file = open(crashlog, 'w')
+        for log_line in log_history:
+            log_line = log_line.msg
+            crashlog_file.write(log_line+'\n')
+        traceback_text = traceback.format_exc()
+        print(traceback_text)
+        crashlog_file.write(traceback_text)
+        crashlog_file.close()

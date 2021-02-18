@@ -150,4 +150,11 @@ if __name__ == '__main__':
         "background": [1, 1, 1, 1],
     }
     themes.insert(0, theme)
-    Test().run()
+    try:
+        Test().run()
+    except Exception as e:
+        try:
+            Test().save_crashlog()
+        except:
+            pass
+        os._exit(-1)
