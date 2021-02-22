@@ -409,8 +409,42 @@ This function is called when the 'Enter' key is pressed in the text input field.
 Themed TextInput widget that limits inputted text to only numbers and a single period.
 
 ## snu.textinput.IntegerInput
-Themed TextInput widget that limits inputted toxt to numbers only.
+Themed TextInput widget that limits inputted text to numbers only.
 
+
+
+# snu.smoothsetting.SmoothSetting Class
+This is a touch and mouse-friendly horizontal list selection widget.  It is designed to show a scrollable list of elements that can be selected with a swipe, drag, or clicking the left/right buttons.  This widget uses the 'Roulette Scroll Effect' class originally from the kivy garden (https://github.com/kivy-garden/garden.roulettescroll) to create a 'snapping' scroll effect.  
+
+### SmoothSetting.content
+List Property.  This should contain a list of strings that define the names of the elements to show.  
+
+### SmoothSetting.start_on
+Numeric Property, defaults to 0.  This is the index number in the 'content' that this widget will display on initialization.  
+
+### SmoothSetting.active
+Numeric Property.  This is the currently set index of the content list that the selector is set to.  Read this value to determine what the user has picked.  
+
+### SmoothSetting.repeat_length
+NumericProperty, defaults to 1.  This is how long in seconds that the left or right button should be held down before it starts being repeated.  
+
+### SmoothSetting.repeat_minimum
+NumericProperty, defaults to 0.1.  This is the minimum repeat time in seconds that will be accelerated to.  
+
+### SmoothSetting.item_width
+NumericProperty, defaults to the widget's height.  This is the width of each element in the list.  Be sure to set this higher if you are using longer strings for your content!  
+
+### SmoothSetting.control_width
+NumericProperty, defaults the widget's height.  This is the width of the left/right buttons.  Setting this to 0 will completely hide and disable the buttons.  
+
+### SmoothSetting.left_image/SmoothSetting.right_image
+String Property.  This points to the filename for the image used for the left/right buttons to change the setting.  Defaults to a simple arrow.  
+
+### SmoothSetting.gradient_transparency
+NumericProperty, defaults to 0.5.  This widget has a gradient overlay to fade out the non-selected numbers by default, the transparency of this gradient can be set here.  Set to 0 for no gradient, 1 for a very heavy gradient.  
+
+### SmoothSetting.rounding
+Numeric Property, defaults to 10.  This is the number of pixels to apply rounding to the corners of the widget, increase this value for a more rounded widget, or set to 0 for a square widget.  
 
 
 # snu.settings

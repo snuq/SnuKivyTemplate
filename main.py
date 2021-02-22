@@ -10,6 +10,7 @@ from snu.stencilview import *
 from snu.textinput import *
 from snu.filebrowser import *
 from snu.recycleview import *
+from snu.smoothsetting import *
 from kivy.base import EventLoop
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty, ListProperty
@@ -159,7 +160,6 @@ if __name__ == '__main__':
         "input_background": [1, 1, 1, 0],
         "scroller": [1, 1, 1, 0],
         "scroller_selected": [1, 1, 1, 0],
-        "sidebar_background": [1, 1, 1, 0],
         "sidebar_resizer": [1, 1, 1, 0],
         "slider_grabber": [1, 1, 1, 0],
         "slider_background": [1, 1, 1, 0],
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     }
     themes.insert(0, theme)
     try:
-        Test(theme_index=0).run()
+        Test().run()
     except Exception as e:
         try:
             Test().save_crashlog()

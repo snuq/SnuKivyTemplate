@@ -2,7 +2,7 @@ from kivy.uix.slider import Slider
 from kivy.clock import Clock
 from kivy.lang.builder import Builder
 Builder.load_string("""
-<NormalSlider>:
+<-NormalSlider>:
     #:set sizing 18
     canvas:
         Color:
