@@ -5,7 +5,7 @@ from kivy.clock import Clock
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
 from kivy.logger import Logger, LoggerHistory
-from kivy.properties import ListProperty, ObjectProperty, NumericProperty, StringProperty, BooleanProperty
+from kivy.properties import ListProperty, ObjectProperty, NumericProperty, StringProperty, BooleanProperty, OptionProperty
 from .textinput import InputMenu
 from .popup import MessagePopupContent, NormalPopup
 from .button import ClickFade
@@ -116,6 +116,8 @@ class NormalApp(App):
     about_text = 'About'  #Override this to change the text that appears in the the about popup in the settings screen
     animations = BooleanProperty(True)  #Set this to disable animations in the app
     animation_length = NumericProperty(0.2)  #Set this to change the length in seconds that animations will take
+    scaling_mode = OptionProperty("divisions", options=["divisions", "pixels"])
+    scale_amount = NumericProperty(15)
 
     list_background_odd = ListProperty([0, 0, 0, 0])
     list_background_even = ListProperty([0, 0, 0, .1])
@@ -127,7 +129,6 @@ class NormalApp(App):
     last_height = NumericProperty(0)
     last_width = NumericProperty(0)
     bubble = ObjectProperty(allownone=True)
-    button_divisors = NumericProperty(15)
     window_top = NumericProperty(0)
     window_left = NumericProperty(0)
     window_width = NumericProperty(800)
@@ -141,11 +142,10 @@ class NormalApp(App):
     button_update = BooleanProperty(False)
 
     def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.theme = Theme()
         self.load_theme(self.theme_index)
         Window.bind(on_draw=self.rescale_interface)
-
-        super().__init__(**kwargs)
 
     def clickfade(self, widget, mode='opacity'):
         try:
@@ -214,7 +214,10 @@ class NormalApp(App):
 
         if (Window.height != self.last_height) or force:
             self.last_height = Window.height
-            self.button_scale = int((Window.height / self.button_divisors) * int(self.config.get("Settings", "buttonsize")) / 100)
+            if self.scaling_mode == 'divisions':
+                self.button_scale = int((Window.height / self.scale_amount) * int(self.config.get("Settings", "buttonsize")) / 100)
+            elif self.scaling_mode == 'pixels':
+                self.button_scale = int(self.scale_amount * (int(self.config.get("Settings", "buttonsize")) / 100))
             self.text_scale = int((self.button_scale / 3) * int(self.config.get("Settings", "textsize")) / 100)
             self.display_border = self.button_scale / 3
             self.display_padding = self.button_scale / 4

@@ -12,13 +12,17 @@ Here is a demo of some of the features implemented:
 
 # snu.app.NormalApp Functionality
 
-This class is a subclass of the 'kivy.app.App' class, it also implements the following features:
+This class is a subclass of the 'kivy.app.App' class.  Please note that to set the following variables to custom values, you can pass them in when creating and running your app like this: 
+
+    MyApp(theme_index=1).run()
+
+This class also implements the following extra features:
 
 ## Themes
 Two default themes are included in the 'themes' variable, this is simply a list of dictionaries with a specific set of keys.  Copy one of the theme variables and modify the color values to create your own.  
 
 * ### NormalApp.button_scale
-Numeric Property, this controlls the overall scale of interface, sane values should be between 50 and 150.  
+Numeric Property, this controls the overall scale of interface, sane values should be between 50 and 150.  
 This value is loaded from the app config file, 'buttonscale'.  
 When the config is changed, or when this value is changed, the app will automatically adjust scale.
 
@@ -27,8 +31,19 @@ Relative scaling of text, sane values are between 50 and 150.
 This value is loaded from the app config file, 'textscale'.  
 When the config is changed, or when this value is changed, the app will automatically adjust scale.
 
-* ### NormalApp.button_divisors
-Numeric Property, this defines the number of buttons that will be vertically visible in the window at a button scale of 100%.  This acts as a multiplier for the button_scale variable.  Defaults to 15, make this larger if you want your overall interface to be smaller.  
+* ### NormalApp.scaling_mode
+Option Property, this must be set to either 'divisions' or 'pixels'.  This determines how the interface will be scaled for all included widgets.  See 'NormalApp.scale_amount' for more information on each option.  
+
+* ### NormalApp.scale_amount
+Numeric Property.  How this is interpreted will vary depending on how the 'scaling_mode' is set.  This acts as a multiplier for the button_scale variable.  Defaults to 15.  
+* If scaling_mode is set to 'divisions', this will define the number of buttons that will be vertically visible in the window at a button scale of 100%.  
+* If scaling_mode is set to 'pixels', this variable will set the height of the standard button in pixels.  
+
+A good way to make the interface scale well to different screen sizes is to use pixel scaling mode, and set the value using a function from kivy.metrics, like so:  
+
+    from kivy.metrics import cm
+    MyApp(scaling_mode='pixels', scale_amount=cm(1)).run()
+
 
 * ### NormalApp.theme_index
 Numeric Property, this defines the index of the theme from the 'themes' variable to be loaded on app creation.  Override this variable in your app to set a different theme index to start with.  

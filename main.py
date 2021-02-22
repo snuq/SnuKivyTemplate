@@ -14,6 +14,7 @@ from kivy.base import EventLoop
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty, ListProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.metrics import cm
 app = None
 
 Window.size = (800, 600)
@@ -172,7 +173,7 @@ if __name__ == '__main__':
     }
     themes.insert(0, theme)
     try:
-        Test().run()
+        Test(theme_index=0).run()
     except Exception as e:
         try:
             Test().save_crashlog()
