@@ -104,6 +104,8 @@ This can be used in the on_start function to recall the last saved window size:
 ## Keyboard Navigation
 Keyboard and joystick/gamepad navigation is implemented through some functions in the NormalApp class, and the snu.navigation.Navigation class.  To use this functionality, you must first activate it in your app's on_start() function, then you must use classes that utilize the Navigation class as a mixin.  Relevant classes in this template include this mixin already (all buttons, all text inputs, slider, smoothsetting and filebrowser list items).  
 
+![Keyboard](keyboard.gif)
+
 To activate navigation in your app, you must do two things:
 * Call one of the built-in start functions to activate it  
 * Use widgets that mix in the snu.navigation.Navigation class  
