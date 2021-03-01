@@ -11,7 +11,7 @@ from kivy.uix.recycleview import RecycleView
 from kivy.uix.dropdown import DropDown
 from kivy.uix.modalview import ModalView
 from kivy.uix.screenmanager import ScreenManager
-from kivy.uix.settings import Settings, SettingItem
+from kivy.uix.settings import Settings
 from .navigation import Navigation
 from .textinput import InputMenu
 from .popup import MessagePopupContent, NormalPopup

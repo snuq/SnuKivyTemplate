@@ -1,9 +1,8 @@
 from kivy.graphics.transformation import Matrix
-from kivy.properties import ObjectProperty, StringProperty, ListProperty, BooleanProperty, NumericProperty, DictProperty
+from kivy.properties import BooleanProperty
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
-from kivy.uix.stencilview import StencilView
 
 from kivy.lang.builder import Builder
 Builder.load_string("""
@@ -129,4 +128,3 @@ class LimitedScatterLayout(ScatterLayout):
         else:
             if self.collide_point(*touch.pos):
                 super(LimitedScatterLayout, self).on_touch_down(touch)
-

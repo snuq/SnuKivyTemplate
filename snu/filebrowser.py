@@ -7,16 +7,14 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.utils import platform
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.relativelayout import RelativeLayout
 from kivy.properties import BooleanProperty, StringProperty, ListProperty, NumericProperty, ObjectProperty
 from kivy.uix.filechooser import FileSystemLocal
 from .popup import NormalPopup, InputPopupContent, ConfirmPopupContent
-from .layouts import Holder, MainArea
+from .layouts import Holder
 from .recycleview import NormalRecycleView, SelectableRecycleBoxLayout, RecycleItem
-from .button import NormalButton, WideButton, ClickFade
+from .button import NormalButton, WideButton
 from .textinput import NormalInput
-from .label import NormalLabel, LeftNormalLabel, ShortLabel
+from .label import NormalLabel, LeftNormalLabel
 from .navigation import Navigation
 from kivy.lang.builder import Builder
 if platform == 'win':

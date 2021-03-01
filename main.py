@@ -16,7 +16,6 @@ from kivy.base import EventLoop
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty, ListProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.metrics import cm
 app = None
 
 Window.size = (800, 600)

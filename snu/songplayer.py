@@ -1,5 +1,5 @@
 import os
-from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty, DictProperty, OptionProperty
+from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, NumericProperty, OptionProperty
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.progressbar import ProgressBar
 from kivy.uix.image import Image

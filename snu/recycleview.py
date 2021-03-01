@@ -1,6 +1,5 @@
 from kivy.app import App
 from kivy.properties import ObjectProperty, StringProperty, ListProperty, BooleanProperty, NumericProperty, DictProperty
-from kivy.uix.boxlayout import BoxLayout
 from kivy.animation import Animation
 from kivy.core.window import Window
 from kivy.uix.recycleview import RecycleView
@@ -8,7 +7,6 @@ from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.uix.recyclegridlayout import RecycleGridLayout
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
-from .button import NormalButton
 from .label import NormalLabel
 from kivy.lang.builder import Builder
 Builder.load_string("""

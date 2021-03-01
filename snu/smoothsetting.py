@@ -1,6 +1,6 @@
 from kivy.animation import Animation
 from kivy.clock import Clock
-from kivy.properties import ListProperty, NumericProperty, ObjectProperty, StringProperty, BooleanProperty, AliasProperty
+from kivy.properties import ListProperty, NumericProperty, ObjectProperty, StringProperty
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.image import Image
 from kivy.uix.label import Label

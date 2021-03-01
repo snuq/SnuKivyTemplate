@@ -81,4 +81,3 @@ class InfoLabel(ShortLabel):
         if self.blinker:
             self.blinker.cancel(self)
         self.bgcolor = [1, 1, 0, 0]
-

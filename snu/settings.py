@@ -4,7 +4,7 @@ from kivy.uix.settings import SettingsWithNoMenu, SettingItem, SettingTitle
 from kivy.properties import ObjectProperty, StringProperty, ListProperty, BooleanProperty
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
-from kivy.compat import string_types, text_type
+from kivy.compat import text_type
 from .scrollview import Scroller
 from .button import WideButton, WideToggle
 from .popup import NormalPopup, InputPopupContent
