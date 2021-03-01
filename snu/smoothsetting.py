@@ -5,6 +5,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.floatlayout import FloatLayout
+from .navigation import Navigation
 from .roulettescroll import RouletteScrollEffect
 from kivy.lang.builder import Builder
 Builder.load_string("""
@@ -145,7 +146,7 @@ class SmoothSettingControl(Image):
             touch.ungrab(self)
 
 
-class SmoothSetting(FloatLayout):
+class SmoothSetting(FloatLayout, Navigation):
     rounding = NumericProperty(10)
     gradient_transparency = NumericProperty(0.5)
     content = ListProperty()
@@ -158,10 +159,10 @@ class SmoothSetting(FloatLayout):
     start_on = NumericProperty(0)
     active = NumericProperty(0)
 
-    def decrease(self):
+    def on_navigation_decrease(self):
         self.ids.scrollerArea.scroll_left()
 
-    def increase(self):
+    def on_navigation_increase(self):
         self.ids.scrollerArea.scroll_right()
 
     def on_active(self, *_):

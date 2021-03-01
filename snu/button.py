@@ -1,3 +1,4 @@
+from .navigation import Navigation
 from kivy.app import App
 from kivy.properties import ListProperty, ObjectProperty, BooleanProperty, NumericProperty
 from kivy.clock import Clock
@@ -89,12 +90,12 @@ Builder.load_string("""
     valign: 'middle'
     size_hint_x: 1
 
-<NormalToggle@ToggleBase>:
+<NormalToggle>:
     toggle: True
     size_hint_x: None
     width: self.texture_size[0] + app.button_scale
 
-<WideToggle@ToggleBase>:
+<WideToggle>:
     toggle: True
 
 <SettingsButton@NormalButton>:
@@ -153,7 +154,7 @@ class ClickFade(ModalView):
             pass
 
 
-class ButtonBase(Button):
+class ButtonBase(Button, Navigation):
     """Button widget that includes theme options and a variety of small additions over a basic button."""
 
     warn = BooleanProperty(False)
@@ -254,6 +255,14 @@ class ToggleBase(ToggleButton, ButtonBase):
     pass
 
 
+class NormalToggle(ToggleBase):
+    pass
+
+
+class WideToggle(ToggleBase):
+    pass
+
+
 class NormalButton(ButtonBase):
     """Basic button widget."""
     pass
@@ -277,6 +286,9 @@ class NormalDropDown(DropDown):
     basic_animation = BooleanProperty(False)
 
     def open(self, *args, **kwargs):
+        if self.parent:
+            self.dismiss()
+            return
         app = App.get_running_app()
         super(NormalDropDown, self).open(*args, **kwargs)
 

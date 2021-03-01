@@ -1,4 +1,5 @@
 import os
+import time
 import json
 from kivy.app import App
 from kivy.clock import Clock
@@ -6,6 +7,12 @@ from kivy.uix.widget import Widget
 from kivy.core.window import Window
 from kivy.logger import Logger, LoggerHistory
 from kivy.properties import ListProperty, ObjectProperty, NumericProperty, StringProperty, BooleanProperty, OptionProperty
+from kivy.uix.recycleview import RecycleView
+from kivy.uix.dropdown import DropDown
+from kivy.uix.modalview import ModalView
+from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.settings import Settings, SettingItem
+from .navigation import Navigation
 from .textinput import InputMenu
 from .popup import MessagePopupContent, NormalPopup
 from .button import ClickFade
@@ -41,6 +48,7 @@ themes = [
         "disabled_text": [0.0, 0.0, 0.0, 0.572],
         "selected": [0.239, 1.0, 0.344, 0.634],
         "background": [1.0, 1.0, 1.0, 1.0],
+        "selected_overlay": [.8, 1, .8, .33],
     },
     {
         "name": "Blue And Green",
@@ -70,6 +78,7 @@ themes = [
         "disabled_text": [1.0, 1.0, 1.0, 0.5],
         "selected": [0.5098, 0.8745, 0.6588, 0.5],
         "background": [0.0, 0.0, 0.0, 1.0],
+        "selected_overlay": [.8, 1, .8, .33],
     }
 ]
 
@@ -106,6 +115,7 @@ class Theme(Widget):
     disabled_text = ListProperty()
     selected = ListProperty()
     background = ListProperty()
+    selected_overlay = ListProperty()
 
 
 class NormalApp(App):
@@ -131,6 +141,7 @@ class NormalApp(App):
     window_left = NumericProperty(0)
     window_width = NumericProperty(800)
     window_height = NumericProperty(600)
+    window_maximized = BooleanProperty(False)
 
     clickfade_object = ObjectProperty()
     infotext = StringProperty('')
@@ -139,11 +150,269 @@ class NormalApp(App):
     theme = ObjectProperty()
     button_update = BooleanProperty(False)
 
+    navigation_enabled = BooleanProperty(True)
+    selected_object = ObjectProperty(allownone=True)
+    last_joystick_axis = NumericProperty(0)
+    joystick_deadzone = NumericProperty(.25)
+    navigation_next = [274, 12, -12]
+    navigation_prev = [273, 11, -11]
+    navigation_activate = [13, 0, 21]
+    navigation_left = [276, 13, -13]
+    navigation_right = [275, 14, -14]
+    navigation_jump = [9]
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.theme = Theme()
         self.load_theme(self.theme_index)
         Window.bind(on_draw=self.rescale_interface)
+        Window.bind(on_maximize=self.set_maximized)
+        Window.bind(on_restore=self.unset_maximized)
+
+    def on_popup(self, *_):
+        self.selected_overlay_set(None)
+
+    def start_keyboard_navigation(self):
+        Window.bind(on_key_down=self.nav_key_down)
+        Window.bind(on_key_up=self.nav_key_up)
+
+    def start_joystick_navigation(self):
+        Window.bind(on_joy_button_down=self.nav_joy_down)
+        Window.bind(on_joy_button_up=self.nav_joy_up)
+        Window.bind(on_joy_axis=self.nav_joy_axis)
+        Window.bind(on_joy_hat=self.nav_joy_hat)
+
+    def nav_joy_down(self, window, padindex, button):
+        self.nav_key_down(window, scancode=(0 - button))
+
+    def nav_joy_up(self, window, padindex, button):
+        self.nav_key_up(window, scancode=(0 - button))
+
+    def nav_joy_axis(self, window, stickid, axisid, axis):
+        axis = axis / 32768
+        if axis == 0:
+            self.last_joystick_axis = 0
+        current_time = time.time()
+        if current_time - self.last_joystick_axis > 1:
+            if axisid == 0:
+                if axis < (0 - self.joystick_deadzone):
+                    self.nav_key_down(window, scancode=276)
+                    self.last_joystick_axis = current_time
+                elif axis > self.joystick_deadzone:
+                    self.nav_key_down(window, scancode=275)
+                    self.last_joystick_axis = current_time
+                else:
+                    self.nav_key_up(window, scancode=276)
+                    self.nav_key_up(window, scancode=275)
+            elif axisid == 1:
+                if axis < (0 - self.joystick_deadzone):
+                    self.nav_key_down(window, scancode=273)
+                    self.last_joystick_axis = current_time
+                elif axis > self.joystick_deadzone:
+                    self.nav_key_down(window, scancode=274)
+                    self.last_joystick_axis = current_time
+                else:
+                    self.nav_key_up(window, scancode=273)
+                    self.nav_key_up(window, scancode=274)
+
+    def nav_joy_hat(self, window, stickid, axisid, axis):
+        axis_x, axis_y = axis
+
+        if axis_x < 0:
+            self.nav_key_down(window, scancode=276)
+        elif axis_x > 0:
+            self.nav_key_down(window, scancode=275)
+        elif axis_x == 0:
+            self.nav_key_up(window, scancode=276)
+            self.nav_key_up(window, scancode=275)
+        if axis_y > 0:
+            self.nav_key_down(window, scancode=273)
+        elif axis_y < 0:
+            self.nav_key_down(window, scancode=274)
+        elif axis_x == 0:
+            self.nav_key_up(window, scancode=273)
+            self.nav_key_up(window, scancode=274)
+
+    def nav_key_down(self, window, scancode=None, *_):
+        """Detects navigation-based key presses"""
+
+        if not self.navigation_enabled:
+            return False
+        if scancode in self.navigation_activate:
+            self.selected_activate()
+            return True
+        elif scancode in self.navigation_next:
+            self.selected_next()
+            return True
+        elif scancode in self.navigation_prev:
+            self.selected_prev()
+            return True
+        elif scancode in self.navigation_left:
+            self.selected_left()
+            return True
+        elif scancode in self.navigation_right:
+            self.selected_right()
+            return True
+        elif scancode in self.navigation_jump:
+            self.selected_skip()
+            return True
+
+    def nav_key_up(self, window, scancode=None, *_):
+        pass
+
+    def selected_activate(self):
+        #Attempts to activate the current selected_object.
+        if self.selected_object:
+            self.selected_object.on_navigation_activate()
+
+    def selected_next(self, lookin=None):
+        #Convenience function for selecting the next widget in the tree
+        self.selected_item(lookin, True)
+
+    def selected_prev(self, lookin=None):
+        #Convenience function for selecting the previous widget in the tree
+        self.selected_item(lookin, False)
+
+    def selected_left(self):
+        if self.selected_object:
+            self.selected_object.on_navigation_decrease()
+
+    def selected_right(self):
+        if self.selected_object:
+            self.selected_object.on_navigation_increase()
+
+    def selected_skip(self, lookin=None):
+        self.selected_item(lookin, True, skip=True)
+
+    def selected_can_select(self, widget):
+        if isinstance(widget, Navigation) and widget.navigation_selectable:
+            return True
+        return False
+
+    def selected_find_active(self, root_widget, forward, found, skip=False):
+        if root_widget == self.selected_object and not found:
+            #The root widget is the current active! If True is returned when recursively searching, the next recursion level up will try to find the next available widget in the tree
+            return True
+
+        is_recycle = False
+        recycle_layout = None
+        if isinstance(root_widget, DropDown):
+            pass
+
+        if isinstance(root_widget, RecycleView):
+            #Recycleview, need to do special stuff to account for some children not currently existing
+            is_recycle = True
+            recycle_layout = root_widget.children[0]
+            children = sorted(recycle_layout.children, key=lambda x: (-x.x, x.y))
+        elif isinstance(root_widget, ScreenManager):
+            #Screen manager widget, we only want to iterate through the current displayed screen
+            children = [root_widget.current_screen]
+        else:
+            #Other types of layouts, just iterate through the child list
+            children = list(root_widget.children)
+        if forward:
+            children.reverse()
+        for index, child in enumerate(children):
+            is_selectable = self.selected_can_select(child)
+            if is_recycle and is_selectable and found:
+                self.selected_scroll_to_item(root_widget)
+            if found and not child.disabled and is_selectable:
+                #last widget in the tree was the old active, now this child becomes the current active
+                return child
+            found_active = self.selected_find_active(child, forward, found, skip=skip)
+            if found_active is True:
+                #This child or one of its children is selected, need to find the next possible
+                found = True
+                if is_recycle and is_selectable:
+                    #self.selected_scroll_to_item(root_widget)
+                    if skip:
+                        #Skip out of this recycleview and go to the next selected
+                        return True
+                    if index + 1 >= len(children):
+                        #This recycleview has no more children to switch to, it could be on the last child, or it may need to be scrolled
+                        scrollable_x = recycle_layout.width - root_widget.width  #how many pixels of scrolling is available in the x direction
+                        scrollable_y = recycle_layout.height - root_widget.height
+                        if root_widget.do_scroll_x and scrollable_x > 0:  #root can scroll in horizontal
+                            if forward and root_widget.scroll_x > 0:  #root can and should scroll forward
+                                root_widget.scroll_x = max(root_widget.scroll_x - (self.selected_object.width / scrollable_x), 0)
+                                return self.selected_object
+                            elif not forward and root_widget.scroll_x < 1:  #root can and should scroll backward
+                                root_widget.scroll_x = min(root_widget.scroll_x + (self.selected_object.width / scrollable_x), 1)
+                                return self.selected_object
+                        elif root_widget.do_scroll_y and scrollable_y > 0:  #root can scroll in vertical
+                            if forward and root_widget.scroll_y > 0:  #root can and should scroll forward
+                                root_widget.scroll_y = max(root_widget.scroll_y - (self.selected_object.height / scrollable_y), 0)
+                                return self.selected_object
+                            elif not forward and root_widget.scroll_y < 1:  #root can and should scroll backward
+                                root_widget.scroll_y = min(root_widget.scroll_y + (self.selected_object.height / scrollable_y), 1)
+                                return self.selected_object
+
+            elif found_active is None:
+                #active not found in this child or its children, move on to the next child
+                continue
+            else:
+                #the next active was found, return it to go up one recursion level
+                return found_active
+
+        if found:
+            #Tried to find the next active but couldnt, continue search in the next tree up
+            return True
+        return None  #The active was not found in this tree at all
+
+    def selected_get_root(self):
+        #determine the best root widget to look for items to navigate
+
+        root_window = self.root.get_parent_window()
+        if len(root_window.children) == 1:
+            return root_window.children[0]
+        for item in reversed(root_window.children):
+            if isinstance(item, DropDown):
+                return item
+        for item in reversed(root_window.children):
+            if isinstance(item, ModalView):
+                return item
+        for item in reversed(root_window.children):
+            if isinstance(item, Settings):
+                return item
+        return root_window
+
+    def selected_item(self, lookin, forward, skip=None):
+        if lookin is None:
+            lookin = self.selected_get_root()
+        active = self.selected_find_active(lookin, forward, False, skip=skip)
+        if active is True or active is None:
+            active = self.selected_find_active(lookin, forward, True, skip=skip)
+        self.selected_overlay_set(active)
+
+    def selected_clear(self):
+        self.selected_overlay_set(None)
+
+    def selected_overlay_set(self, widget):
+        #This function will actually set the given widget as the current selected, also ensures it is scrolled to if in a Scroller
+
+        if self.selected_object is not None:
+            self.selected_object.on_navigation_deselect()
+        self.selected_object = widget
+        if widget is None:
+            return
+        self.selected_object.on_navigation_select()
+        self.selected_scroll_to_item(widget)
+
+    def selected_scroll_to_item(self, widget):
+        parent = widget.parent
+        while parent is not None:
+            if parent.parent == parent:
+                break
+            if hasattr(parent, 'scroll_y'):
+                try:
+                    if parent.children[0].height < parent.height:
+                        parent.scroll_y = 1
+                    else:
+                        parent.scroll_to(widget, animate=False, padding=20)
+                except:
+                    pass
+                break
+            parent = parent.parent
 
     def clickfade(self, widget, mode='opacity'):
         try:
@@ -178,20 +447,34 @@ class NormalApp(App):
                 setattr(theme, color, new_color)
         self.button_update = not self.button_update
 
+    def set_maximized(self, *_):
+        self.window_maximized = True
+
+    def unset_maximized(self, *_):
+        self.window_maximized = False
+
     def set_window_size(self, load=True):
         if load:
             self.load_window_size()
-        Window.left = self.window_left
-        Window.top = self.window_top
-        Window.size = (self.window_width, self.window_height)
+        if self.config.getboolean("Settings", "remember_window"):
+            if self.window_maximized:
+                Window.maximize()
+            else:
+                Window.left = self.window_left
+                Window.top = self.window_top
+                Window.size = (self.window_width, self.window_height)
 
     def load_window_size(self):
+        self.window_maximized = self.config.getboolean('Settings', 'window_maximized')
         self.window_top = int(self.config.get('Settings', 'window_top'))
         self.window_left = int(self.config.get('Settings', 'window_left'))
         self.window_height = int(self.config.get('Settings', 'window_height'))
         self.window_width = int(self.config.get('Settings', 'window_width'))
 
     def store_window_size(self):
+        self.config.set("Settings", "window_maximized", 1 if self.window_maximized else 0)
+        if self.window_maximized:
+            return
         self.window_top = Window.top
         self.window_left = Window.left
         self.window_width = Window.size[0]
@@ -280,8 +563,10 @@ class NormalApp(App):
 
         config.setdefaults(
             'Settings', {
+                'remember_window': 1,
                 'buttonsize': 100,
                 'textsize': 100,
+                'window_maximized': 0,
                 'window_top': 0,
                 'window_left': 0,
                 'window_width': 800,
@@ -300,18 +585,29 @@ class NormalApp(App):
             "key": "buttonsize"
         })
         settingspanel.append({
+            "type": "title",
+            "title": "General Settings"
+        })
+        settingspanel.append({
             "type": "numeric",
             "title": "Button Scale",
-            "desc": "Button Scale Percent",
+            "desc": "Scale percentage for interface elements",
             "section": "Settings",
             "key": "buttonsize"
         })
         settingspanel.append({
             "type": "numeric",
             "title": "Text Scale",
-            "desc": "Font Scale Percent",
+            "desc": "Scale percentage for text in the interface",
             "section": "Settings",
             "key": "textsize"
+        })
+        settingspanel.append({
+            "type": "bool",
+            "title": "Remember Window",
+            "desc": "Recall the last used window size and position on startup",
+            "section": "Settings",
+            "key": "remember_window"
         })
         settings.add_json_panel('Settings', self.config, data=json.dumps(settingspanel))
 

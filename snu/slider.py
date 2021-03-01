@@ -1,5 +1,6 @@
 from kivy.uix.slider import Slider
 from kivy.clock import Clock
+from .navigation import Navigation
 from kivy.lang.builder import Builder
 Builder.load_string("""
 <-NormalSlider>:
@@ -46,5 +47,17 @@ class SpecialSlider(Slider):
         pass
 
 
-class NormalSlider(SpecialSlider):
-    pass
+class NormalSlider(SpecialSlider, Navigation):
+    def on_navigation_decrease(self):
+        new_value = self.value - .1
+        if new_value < self.min:
+            self.value = self.min
+        else:
+            self.value = new_value
+
+    def on_navigation_increase(self):
+        new_value = self.value + .1
+        if new_value > self.max:
+            self.value = self.max
+        else:
+            self.value = new_value

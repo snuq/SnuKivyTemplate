@@ -10,13 +10,14 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.properties import BooleanProperty, StringProperty, ListProperty, NumericProperty, ObjectProperty
-from snu.app import NormalApp
-from snu.popup import NormalPopup, InputPopupContent, ConfirmPopupContent
-from snu.layouts import Holder, MainArea
-from snu.recycleview import NormalRecycleView, SelectableRecycleBoxLayout, RecycleItem
-from snu.button import NormalButton, WideButton, ClickFade
-from snu.textinput import NormalInput
-from snu.label import NormalLabel, LeftNormalLabel, ShortLabel
+from kivy.uix.filechooser import FileSystemLocal
+from .popup import NormalPopup, InputPopupContent, ConfirmPopupContent
+from .layouts import Holder, MainArea
+from .recycleview import NormalRecycleView, SelectableRecycleBoxLayout, RecycleItem
+from .button import NormalButton, WideButton, ClickFade
+from .textinput import NormalInput
+from .label import NormalLabel, LeftNormalLabel, ShortLabel
+from .navigation import Navigation
 from kivy.lang.builder import Builder
 if platform == 'win':
     from ctypes import windll, create_unicode_buffer
@@ -198,7 +199,7 @@ def sort_nicely(l):
     return sorted(l, key=alphanum_key)
 
 
-class FileBrowserItem(RecycleItem, BoxLayout):
+class FileBrowserItem(RecycleItem, BoxLayout, Navigation):
     text = StringProperty()
     fullpath = StringProperty()
     type = StringProperty()
@@ -210,6 +211,11 @@ class FileBrowserItem(RecycleItem, BoxLayout):
     selectable = BooleanProperty(False)
     file_size = StringProperty()
     modified = StringProperty()
+
+    def on_navigation_activate(self):
+        if self.selectable:
+            self.parent.click_node(self)
+            self.owner.single_click(self)
 
     def on_selected(self, *_):
         if self.type == 'folder' and self.multi_select and self.selected:
@@ -251,6 +257,7 @@ class FileBrowser(BoxLayout):
     folder_select = BooleanProperty(False)  #Allows the dialog to select a folder
     multi_select = BooleanProperty(False)  #Select multiple files or folders
     show_files = BooleanProperty(True)  #Display files in the browser
+    show_hidden = BooleanProperty(True)  #Display hidden files in the browser
     require_filename = BooleanProperty(True)  #If true, the ok button cannot be clicked in file select mode if no filename is given.
     edit_filename = BooleanProperty(False)  #Allows the user to edit the filename(s) that are selected
     autoselect_files = BooleanProperty(False)  #Automatically selects all files when a folder is entered
@@ -336,6 +343,8 @@ class FileBrowser(BoxLayout):
         if self.folder_select:
             self.selected = []
             self.selected = [self.folder]
+        elif self.clear_filename:
+            self.selected = []
         self.refresh_folder()
 
     def dismiss_popup(self, *_):
@@ -481,8 +490,12 @@ class FileBrowser(BoxLayout):
                 file_selected = True
             else:
                 file_selected = False
+            filesystem = FileSystemLocal()
             for file in files:
                 fullpath = os.path.join(self.folder, file)
+                if not self.show_hidden:
+                    if filesystem.is_hidden(fullpath):
+                        continue
                 file_size = int(os.path.getsize(fullpath))
                 modified = int(os.path.getmtime(fullpath))
                 file_data = {

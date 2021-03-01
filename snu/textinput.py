@@ -4,6 +4,7 @@ from kivy.uix.textinput import TextInput
 from kivy.clock import Clock
 from kivy.properties import NumericProperty, ObjectProperty, BooleanProperty
 from kivy.uix.bubble import Bubble
+from .navigation import Navigation
 from kivy.lang.builder import Builder
 Builder.load_string("""
 <-TextInput>:
@@ -41,6 +42,7 @@ Builder.load_string("""
     font_size: app.text_scale
 
 <FloatInput>:
+    multiline: False
     write_tab: False
     background_color: app.theme.input_background
     disabled_foreground_color: 1,1,1,.75
@@ -50,6 +52,7 @@ Builder.load_string("""
     font_size: app.text_scale
 
 <IntegerInput>:
+    multiline: False
     write_tab: False
     background_color: app.theme.input_background
     disabled_foreground_color: 1,1,1,.75
@@ -86,13 +89,16 @@ Builder.load_string("""
 """)
 
 
-class NormalInput(TextInput):
+class NormalInput(TextInput, Navigation):
     """Text input widget that adds a popup menu for normal text operations."""
 
     context_menu = BooleanProperty(True)
     long_press_time = NumericProperty(1)
     long_press_clock = None
     long_press_pos = None
+
+    def on_navigation_activate(self):
+        self.focus = not self.focus
 
     def on_touch_up(self, touch):
         if self.long_press_clock:
@@ -109,7 +115,6 @@ class NormalInput(TextInput):
                 if hasattr(touch, 'button'):
                     if touch.button == 'right':
                         app = App.get_running_app()
-
                         app.popup_bubble(self, pos)
                         return
         super(NormalInput, self).on_touch_down(touch)
@@ -121,12 +126,22 @@ class NormalInput(TextInput):
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
         app = App.get_running_app()
         app.close_bubble()
-        if keycode[0] == 13:
+        if keycode[0] == 27:
+            self.focus = False
+            return True
+        if keycode[0] in [13, 271]:
             self.press_enter(self, self.text)
+            if not self.multiline:
+                self.focus = False
+                return True
         super().keyboard_on_key_down(window, keycode, text, modifiers)
 
     def press_enter(self, instance, text):
         pass
+
+    def on_focus(self, *_):
+        app = App.get_running_app()
+        app.navigation_enabled = not self.focus
 
 
 class FloatInput(NormalInput):

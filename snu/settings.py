@@ -1,9 +1,15 @@
+import os
 from kivy.app import App
-from kivy.uix.settings import SettingsWithNoMenu, SettingItem
-from kivy.properties import ObjectProperty, StringProperty
+from kivy.uix.settings import SettingsWithNoMenu, SettingItem, SettingTitle
+from kivy.properties import ObjectProperty, StringProperty, ListProperty, BooleanProperty
 from kivy.uix.popup import Popup
+from kivy.uix.boxlayout import BoxLayout
 from kivy.compat import string_types, text_type
+from .scrollview import Scroller
+from .button import WideButton, WideToggle
 from .popup import NormalPopup, InputPopupContent
+from .filebrowser import FileBrowser
+from .navigation import Navigation
 
 from kivy.lang.builder import Builder
 Builder.load_string("""
@@ -116,8 +122,44 @@ Builder.load_string("""
             text: root.button_text
             on_release: root.close()
 
-<SettingString>:
+<-SettingTitle>:
     size_hint_y: None
+    height: max(dp(20), self.texture_size[1] + dp(40))
+    color: (.9, .9, .9, 1)
+    font_size: '15sp'
+    canvas:
+        Color:
+            rgb: .2, .2, .2
+        Rectangle:
+            pos: self.x, self.y - 2
+            size: self.width, 1
+    Label:
+        padding: app.button_scale, 0
+        size_hint: None, None
+        size: root.size
+        color: app.theme.text
+        text: root.title
+        text_size: self.size
+        halign: 'left'
+        valign: 'bottom'
+        pos: root.pos
+        font_size: '15sp'
+
+<SettingString>:
+    Label:
+        text: root.value or ''
+        pos: root.pos
+        font_size: '15sp'
+        color: app.theme.text
+
+<SettingPath>:
+    Label:
+        text: root.value or ''
+        pos: root.pos
+        font_size: '15sp'
+        color: app.theme.text
+
+<SettingOptions>:
     Label:
         text: root.value or ''
         pos: root.pos
@@ -127,7 +169,6 @@ Builder.load_string("""
 <SettingBoolean>:
     true_text: 'On'
     false_text: 'Off'
-    size_hint_y: None
     NormalToggle:
         size_hint_x: 1
         state: 'normal' if root.value == '0' else 'down'
@@ -136,11 +177,110 @@ Builder.load_string("""
 """)
 
 
-class SettingString(SettingItem):
+class SettingOptions(SettingItem, Navigation):
+    """Options value in the settings screen.  Customizes the input popup"""
+
+    options = ListProperty([])
+    popup = ObjectProperty(None, allownone=True)
+
+    def on_navigation_activate(self):
+        self._create_popup(self)
+
+    def on_panel(self, instance, value):
+        if value is None:
+            return
+        self.fbind('on_release', self._create_popup)
+
+    def _dismiss(self, *_):
+        app = App.get_running_app()
+        if app.popup:
+            app.popup.dismiss()
+
+    def _set_option(self, instance):
+        self.value = instance.text
+        self._dismiss()
+
+    def _create_popup(self, instance):
+        app = App.get_running_app()
+        if app.popup:
+            app.popup.dismiss()
+        content = BoxLayout(orientation='vertical')
+        scroller = Scroller()
+        content.add_widget(scroller)
+        options_holder = BoxLayout(orientation='vertical', size_hint_y=None, height=len(self.options) * app.button_scale)
+        for option in self.options:
+            button = WideToggle(text=option)
+            if self.value == option:
+                button.state = 'down'
+            options_holder.add_widget(button)
+            button.bind(on_release=self._set_option)
+        scroller.add_widget(options_holder)
+        cancel_button = WideButton(text='Cancel')
+        cancel_button.bind(on_release=self._dismiss)
+        content.add_widget(cancel_button)
+        max_height = app.root.height - (app.button_scale * 3)
+        height = min((len(self.options) + 3) * app.button_scale, max_height)
+        app.popup = NormalPopup(title=self.title, content=content, size_hint=(None, None), size=(app.popup_x, height))
+        app.popup.open()
+
+
+class SettingPath(SettingItem, Navigation):
+    """Path value in the settings screen.  Customizes the input popup"""
+
+    popup = ObjectProperty(None, allownone=True)
+    show_hidden = BooleanProperty(True)
+    dirselect = BooleanProperty(True)
+
+    def on_navigation_activate(self):
+        self._create_popup(self)
+
+    def on_panel(self, instance, value):
+        if value is None:
+            return
+        self.fbind('on_release', self._create_popup)
+
+    def _dismiss(self, *largs):
+        app = App.get_running_app()
+        if app.popup:
+            app.popup.dismiss()
+        app.popup = None
+
+    def _validate(self, browser):
+        value = browser.selected[0]
+        self._dismiss()
+        if not value:
+            return
+        self.value = os.path.realpath(value)
+
+    def _create_popup(self, instance):
+        app = App.get_running_app()
+        if app.popup:
+            app.popup.dismiss()
+
+        if self.value:
+            if not self.dirselect:
+                initial_path, selected = os.path.split(self.value)
+            else:
+                initial_path = self.value
+                selected = ''
+        else:
+            initial_path = os.getcwd()
+            selected = ''
+        content = FileBrowser(folder=initial_path, selected=[selected], show_hidden=self.show_hidden, file_select=not self.dirselect, folder_select=self.dirselect, show_files=not self.dirselect)
+        content.bind(on_select=self._validate)
+        content.bind(on_cancel=self._dismiss)
+        app.popup = NormalPopup(title=self.title, content=content, size_hint=(0.9, 0.9))
+        app.popup.open()
+
+
+class SettingString(SettingItem, Navigation):
     """String value in the settings screen.  Customizes the input popup"""
 
     popup = ObjectProperty(None, allownone=True)
     textinput = ObjectProperty(None)
+
+    def on_navigation_activate(self):
+        self._create_popup(self)
 
     def on_panel(self, instance, value):
         if value is None:
@@ -192,6 +332,9 @@ class AppSettings(SettingsWithNoMenu):
     def __init__(self, **kwargs):
         super(AppSettings, self).__init__(**kwargs)
         self.register_type('string', SettingString)
+        self.register_type('options', SettingOptions)
+        self.register_type('title', SettingTitle)
+        self.register_type('path', SettingPath)
         self.register_type('numeric', SettingNumeric)
         self.register_type('aboutbutton', SettingAboutButton)
 
@@ -199,15 +342,6 @@ class AppSettings(SettingsWithNoMenu):
 class SettingAboutButton(SettingItem):
     """Settings widget that opens an about dialog."""
     pass
-
-
-class SettingsThemeButton(SettingItem):
-    """Widget that opens the theme screen"""
-
-    def show_theme(self):
-        app = App.get_running_app()
-        app.close_settings()
-        app.show_theme()
 
 
 class AboutPopup(Popup):

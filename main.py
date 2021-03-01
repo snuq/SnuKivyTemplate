@@ -10,6 +10,7 @@ from snu.stencilview import *
 from snu.textinput import *
 from snu.filebrowser import *
 from snu.recycleview import *
+from snu.songplayer import *
 from snu.smoothsetting import *
 from kivy.base import EventLoop
 from kivy.core.window import Window
@@ -102,6 +103,8 @@ class Test(NormalApp):
         """Called when the app is started, after kv files are loaded"""
 
         self.set_window_size()
+        self.start_keyboard_navigation()
+        self.start_joystick_navigation()
         self.load_theme(1)
         EventLoop.window.bind(on_keyboard=self.hook_keyboard)
 
@@ -170,6 +173,7 @@ if __name__ == '__main__':
         "disabled_text": [1, 1, 1, 0],
         "selected": [1, 1, 1, 0],
         "background": [1, 1, 1, 1],
+        "selected_overlay": [1, 1, 1, 0],
     }
     themes.insert(0, theme)
     try:
