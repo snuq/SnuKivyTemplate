@@ -40,7 +40,7 @@ Builder.load_string("""
     do_scroll_y: True
     scroll_distance: 10
     scroll_timeout: 200
-    bar_width: int(app.button_scale * .5)
+    bar_width: app.scrollbar_scale
     bar_color: app.theme.scroller_selected
     bar_inactive_color: app.theme.scroller
     scroll_type: ['bars', 'content']

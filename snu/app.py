@@ -47,6 +47,7 @@ themes = [
         "text": [0.0, 0.011, 0.0, 1.0],
         "disabled_text": [0.0, 0.0, 0.0, 0.572],
         "selected": [0.239, 1.0, 0.344, 0.634],
+        "active": [1.0, 0.239, 0.344, 0.5],
         "background": [1.0, 1.0, 1.0, 1.0],
         "selected_overlay": [.8, 1, .8, .33],
     },
@@ -77,6 +78,7 @@ themes = [
         "text": [1.0, 1.0, 1.0, 0.9],
         "disabled_text": [1.0, 1.0, 1.0, 0.5],
         "selected": [0.5098, 0.8745, 0.6588, 0.5],
+        "active": [1.0, 0.239, 0.344, 0.5],
         "background": [0.0, 0.0, 0.0, 1.0],
         "selected_overlay": [.8, 1, .8, .33],
     }
@@ -114,6 +116,7 @@ class Theme(Widget):
     text = ListProperty()
     disabled_text = ListProperty()
     selected = ListProperty()
+    active = ListProperty()
     background = ListProperty()
     selected_overlay = ListProperty()
 
@@ -130,6 +133,7 @@ class NormalApp(App):
     list_background_odd = ListProperty([0, 0, 0, 0])
     list_background_even = ListProperty([0, 0, 0, .1])
     button_scale = NumericProperty(100)
+    scrollbar_scale = NumericProperty(50)
     text_scale = NumericProperty(100)
     display_padding = NumericProperty(8)
     display_border = NumericProperty(16)
@@ -500,6 +504,7 @@ class NormalApp(App):
             elif self.scaling_mode == 'pixels':
                 self.button_scale = int(self.scale_amount * (int(self.config.get("Settings", "buttonsize")) / 100))
             self.text_scale = int((self.button_scale / 3) * int(self.config.get("Settings", "textsize")) / 100)
+            self.scrollbar_scale = int(((self.button_scale / 2) * (int(self.config.get("Settings", "scrollersize")) / 100)))
             self.display_border = self.button_scale / 3
             self.display_padding = self.button_scale / 4
 
@@ -566,6 +571,7 @@ class NormalApp(App):
                 'remember_window': 1,
                 'buttonsize': 100,
                 'textsize': 100,
+                'scrollersize': 100,
                 'window_maximized': 0,
                 'window_top': 0,
                 'window_left': 0,
@@ -601,6 +607,13 @@ class NormalApp(App):
             "desc": "Scale percentage for text in the interface",
             "section": "Settings",
             "key": "textsize"
+        })
+        settingspanel.append({
+            "type": "numeric",
+            "title": "Scrollbar Scale",
+            "desc": "Scale percentage for scrollbars, 100% is half the button size",
+            "section": "Settings",
+            "key": "scrollersize"
         })
         settingspanel.append({
             "type": "bool",

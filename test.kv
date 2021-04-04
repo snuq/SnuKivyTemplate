@@ -24,7 +24,7 @@
             id: mainArea
             Scroller:
                 BoxLayout:
-                    padding: app.button_scale / 2, 0
+                    padding: app.scrollbar_scale, 0
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
@@ -95,6 +95,7 @@
                             data: root.recycle_data_1
                             viewclass: 'RecycleItemButton'
                             SelectableRecycleGridLayout:
+                                padding: 0, 0, app.scrollbar_scale, 0
                                 default_size: None, app.button_scale
                                 default_size_hint: 1, None
                                 size_hint_x: 1
@@ -104,6 +105,7 @@
                             data: root.recycle_data_2
                             viewclass: 'RecycleItemLabel'
                             SelectableRecycleBoxLayout:
+                                padding: 0, 0, app.scrollbar_scale, 0
                                 multiselect: True
                                 default_size: None, app.button_scale
                                 default_size_hint: 1, None
