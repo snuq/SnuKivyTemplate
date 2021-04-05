@@ -159,6 +159,9 @@ class SmoothSetting(FloatLayout, Navigation):
     start_on = NumericProperty(0)
     active = NumericProperty(0)
 
+    def scroll_to_element(self, index, instant=False):
+        self.ids.scrollerArea.scroll_to_element(index, instant=instant)
+
     def on_navigation_decrease(self):
         self.ids.scrollerArea.scroll_left()
 
