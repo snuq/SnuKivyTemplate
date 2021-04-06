@@ -22,6 +22,14 @@ class Navigation(Widget):
         except:
             pass
 
+    def on_navigation_next(self):
+        #Override this function and return True to 'lock' the next navigation function to this widget
+        return False
+
+    def on_navigation_prev(self):
+        #Override this function and return True to 'lock' the previous navigation function to this widget
+        return False
+
     def on_navigation_increase(self):
         #Override this function to allow the keyboard navigation 'right' to control this widget.
         pass

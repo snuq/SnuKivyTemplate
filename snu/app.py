@@ -271,10 +271,16 @@ class NormalApp(App):
 
     def selected_next(self, lookin=None):
         #Convenience function for selecting the next widget in the tree
+        if self.selected_object:
+            if self.selected_object.on_navigation_next():
+                return
         self.selected_item(lookin, True)
 
     def selected_prev(self, lookin=None):
         #Convenience function for selecting the previous widget in the tree
+        if self.selected_object:
+            if self.selected_object.on_navigation_prev():
+                return
         self.selected_item(lookin, False)
 
     def selected_left(self):

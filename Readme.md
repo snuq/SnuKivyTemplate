@@ -184,6 +184,12 @@ This function is called when the widget is selected and the 'navigation_right' k
 * on_navigation_decrease()  
 This function is called when the widget is selected and the 'navigation_left' key is pressed.  
 
+* on_navigation_next()
+This function is called on the selected widget before the next widget in the tree is navigated to.  Have this function return True to 'stick' the keyboard navigation to this widget, this is useful for enabling custom navigation of child widgets.  When the children have been navigated, have this function return False.  
+
+* on_navigation_prev()
+This function is called on the selected widget before the previous widget in the tree is navigated to.  Have this function return True to 'stick' the keyboard navigation to this widget, this is useful for enabling custom navigation of child widgets.  When the children have been navigated, have this function return False.  
+
 * on_navigation_select()  
 This function is called when a widget is selected.  This should not need to be overriden normally, but widgets with custom canvas.after code may have issues with the default function.  
 
