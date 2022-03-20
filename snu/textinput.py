@@ -104,7 +104,7 @@ class NormalInput(TextInput, Navigation):
         if self.long_press_clock:
             self.long_press_clock.cancel()
             self.long_press_clock = None
-        super(NormalInput, self).on_touch_up(touch)
+        return super(NormalInput, self).on_touch_up(touch)
 
     def on_touch_down(self, touch):
         if self.context_menu:
@@ -116,8 +116,8 @@ class NormalInput(TextInput, Navigation):
                     if touch.button == 'right':
                         app = App.get_running_app()
                         app.popup_bubble(self, pos)
-                        return
-        super(NormalInput, self).on_touch_down(touch)
+                        return True
+        return super(NormalInput, self).on_touch_down(touch)
 
     def do_long_press(self, *_):
         app = App.get_running_app()
