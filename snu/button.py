@@ -64,7 +64,7 @@ Builder.load_string("""
     menu: True
     size_hint_x: 1
 
-<NormalMenuStarter@ButtonBase>:
+<NormalMenuStarter>:
     canvas.after:
         Color:
             rgba: self.color
@@ -76,7 +76,7 @@ Builder.load_string("""
     size_hint_x: None
     width: self.texture_size[0] + (app.button_scale * 1.5)
 
-<WideMenuStarter@ButtonBase>:
+<WideMenuStarter>:
     canvas.after:
         Color:
             rgba: self.color
@@ -275,6 +275,14 @@ class WideButton(ButtonBase):
 
 class MenuButton(ButtonBase):
     """Basic class for a drop-down menu button item."""
+    pass
+
+
+class NormalMenuStarter(ButtonBase):
+    pass
+
+
+class WideMenuStarter(ButtonBase):
     pass
 
 
