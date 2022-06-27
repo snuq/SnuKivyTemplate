@@ -6,7 +6,7 @@ from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.uix.recyclegridlayout import RecycleGridLayout
-from kivy.uix.recycleview.layout import LayoutSelectionBehavior
+from kivy.uix.widget import Widget
 from .label import NormalLabel
 from kivy.lang.builder import Builder
 Builder.load_string("""
@@ -113,7 +113,7 @@ class RecycleItemLabel(RecycleItem, NormalLabel):
     pass
 
 
-class SelectableRecycleLayout(LayoutSelectionBehavior):
+class SelectableRecycleLayout(Widget):
     """Adds selection and focus behavior to the view."""
     owner = ObjectProperty()
     selected = DictProperty()
@@ -150,7 +150,6 @@ class SelectableRecycleLayout(LayoutSelectionBehavior):
         self.refresh_selection()
 
     def select_node(self, node):
-        super().select_node(node)
         if not self.multiselect:
             self.deselect_all()
         node.selected = True
@@ -162,7 +161,6 @@ class SelectableRecycleLayout(LayoutSelectionBehavior):
         self.selected = node.data
 
     def deselect_node(self, node):
-        super().deselect_node(node)
         if node.data in self.selects:
             self.selects.remove(node.data)
         if self.selected == node.data:
