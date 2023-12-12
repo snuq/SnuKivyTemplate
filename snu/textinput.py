@@ -151,6 +151,12 @@ class FloatInput(NormalInput):
 
     def insert_text(self, substring, from_undo=False):
         pat = self.pat
+        if '-' in substring:
+            substring = substring.replace('-', '')
+            if '-' in self.text:
+                self.text = self.text.replace('-', '')
+            else:
+                self.text = '-' + self.text
         if '.' in self.text:
             s = re.sub(pat, '', substring)
         else:
@@ -165,6 +171,12 @@ class IntegerInput(NormalInput):
 
     def insert_text(self, substring, from_undo=False):
         pat = self.pat
+        if '-' in substring:
+            substring = substring.replace('-', '')
+            if '-' in self.text:
+                self.text = self.text.replace('-', '')
+            else:
+                self.text = '-' + self.text
         s = re.sub(pat, '', substring)
         return super(IntegerInput, self).insert_text(s, from_undo=from_undo)
 
