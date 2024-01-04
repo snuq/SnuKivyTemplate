@@ -273,13 +273,6 @@ Themed widget for DropDown menus, use instead of the standard DropDown class.  T
 
 <br/>
 
-# snu.image Classes
-
-#### snu.image.FillImage
-Custom subclass of kivy.uix.image.Image that keeps the source in proper aspect ratio and scales it to completely fill the widget.  
-
-<br/>
-
 # snu.label Classes
 
 #### Theme Colors
