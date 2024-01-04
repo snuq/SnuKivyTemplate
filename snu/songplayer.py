@@ -24,21 +24,21 @@ Builder.load_string("""
         song: root
         width: '44dp'
         source: root.image_stop
-        allow_stretch: True
+        fit_mode: 'contain'
 
     SongPlayerPlayPause:
         size_hint_x: None
         song: root
         width: '44dp'
         source: root.image_pause if root.state == 'play' else root.image_play
-        allow_stretch: True
+        fit_mode: 'contain'
 
     SongPlayerVolume:
         song: root
         size_hint_x: None
         width: '44dp'
         source: root.image_volumehigh if root.volume > 0.8 else (root.image_volumemedium if root.volume > 0.4 else (root.image_volumelow if root.volume > 0 else root.image_volumemuted))
-        allow_stretch: True
+        fit_mode: 'contain'
 
     Widget:
         size_hint_x: None
