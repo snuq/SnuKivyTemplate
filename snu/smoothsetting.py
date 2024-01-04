@@ -10,8 +10,7 @@ from .roulettescroll import RouletteScrollEffect
 from kivy.lang.builder import Builder
 Builder.load_string("""
 <SmoothSettingControl>:
-    keep_ratio: False
-    allow_stretch: True
+    fit_mode: 'fill'
     size_hint_x: None
 
 <SmoothSettingButton>:
