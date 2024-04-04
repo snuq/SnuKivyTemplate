@@ -297,6 +297,9 @@ Larger font size and colored using theme's header_text value for the color.
 #### snu.label.InfoLabel
 Special label that is filled with the app.infotext text, will also flash when the text changes.
 
+#### snu.label.TickerLabel
+Label that scrolls text back and forth when the text is larger than the label size.  Set 'ticker_delay' to adjust delay in seconds before label scrolls.  Set 'ticker_amount' to change the scroll pixel size per frame, this can be less than one for slower scrolling.
+
 <br/>
 
 # snu.layouts Classes

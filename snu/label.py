@@ -1,5 +1,6 @@
 from kivy.app import App
-from kivy.properties import ListProperty, ObjectProperty
+from kivy.properties import ListProperty, ObjectProperty, NumericProperty, StringProperty
+from kivy.clock import Clock
 from kivy.animation import Animation
 from kivy.uix.label import Label
 from kivy.lang.builder import Builder
@@ -34,6 +35,30 @@ Builder.load_string("""
     mipmap: True
     text: app.infotext
     color: app.theme.info_text
+
+<-TickerLabel>:
+    canvas.before:
+        StencilPush
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        StencilUse
+    canvas:
+        Rectangle:
+            texture: self.texture
+            size: self.texture_size
+            pos: self.x - self.ticker_offset, self.center_y - self.texture_size[1] / 2
+    canvas.after:
+        StencilUnUse
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        StencilPop
+    mipmap: True
+    color: app.theme.text
+    font_size: app.text_scale
+    size_hint_y: None
+    height: app.button_scale
 
 <HeaderLabel@Label>:
     mipmap: True
@@ -81,3 +106,37 @@ class InfoLabel(ShortLabel):
         if self.blinker:
             self.blinker.cancel(self)
         self.bgcolor = [1, 1, 0, 0]
+
+
+class TickerLabel(Label):
+    """Label that will scroll a line of text back and forth if it is longer than the widget size"""
+    ticker_delay = NumericProperty(1.5)  #delay in seconds before ticker starts, also is pause before scrolling back
+    ticker_amount = NumericProperty(0.5)  #pixels to scroll by on each tick, can be less than 1
+    ticker_transition = StringProperty('in_out_sine')  #type of animation to be used, try 'linear' also
+    ticker_offset = NumericProperty(0)
+    ticker_animate = ObjectProperty(allownone=True)
+    ticker_delayer = ObjectProperty(allownone=True)
+
+    def on_size(self, *_):
+        self.stop_animate()
+        if self.ticker_delayer:
+            self.ticker_delayer.cancel()
+            self.ticker_delayer = None
+        self.ticker_delayer = Clock.schedule_once(self.setup_animate, self.ticker_delay)
+
+    def stop_animate(self, *_):
+        if self.ticker_animate:
+            self.ticker_animate.cancel(self)
+            self.ticker_animate = None
+        self.ticker_offset = 0
+
+    def setup_animate(self, *_):
+        if not self.texture:
+            return
+        if self.texture.size[0] > self.width:
+            self.ticker_offset = 0
+            ticker_per_tick = (self.texture_size[0] - self.width) / self.ticker_amount
+            ticker_time = ticker_per_tick / 100
+            self.ticker_animate = Animation(ticker_offset=self.texture.width - self.width, duration=ticker_time, t=self.ticker_transition) + Animation(duration=self.ticker_delay) + Animation(ticker_offset=0, duration=ticker_time, t=self.ticker_transition) + Animation(duration=self.ticker_delay)
+            self.ticker_animate.repeat = True
+            self.ticker_animate.start(self)
