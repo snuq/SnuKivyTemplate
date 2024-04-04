@@ -117,7 +117,13 @@ class TickerLabel(Label):
     ticker_animate = ObjectProperty(allownone=True)
     ticker_delayer = ObjectProperty(allownone=True)
 
+    def on_text(self, *_):
+        self.reset_ticker()
+
     def on_size(self, *_):
+        self.reset_ticker()
+
+    def reset_ticker(self):
         self.stop_animate()
         if self.ticker_delayer:
             self.ticker_delayer.cancel()
