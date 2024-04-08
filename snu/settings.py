@@ -1,7 +1,8 @@
 import os
 from kivy.app import App
-from kivy.uix.settings import SettingsWithNoMenu, SettingItem, SettingTitle
-from kivy.properties import ObjectProperty, StringProperty, ListProperty, BooleanProperty
+from kivy.uix.settings import SettingsWithNoMenu, SettingTitle
+from kivy.uix.settings import SettingItem as SettingItemOriginal
+from kivy.properties import ObjectProperty, StringProperty, ListProperty, BooleanProperty, NumericProperty
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.compat import text_type
@@ -41,6 +42,7 @@ Builder.load_string("""
             text: "Settings"
 
 <-SettingItem>:
+    label_size_hint_x: 0.66
     size_hint: .25, None
     height: labellayout.texture_size[1] + dp(10)
     content: content
@@ -62,7 +64,7 @@ Builder.load_string("""
                     pos: self.x, self.y - 2
                     size: self.width, 1
             Label:
-                size_hint_x: .66
+                size_hint_x: max(root.label_size_hint_x, 0.001)
                 id: labellayout
                 markup: True
                 text: u"{0}\\n[size=13sp]{1}[/size]".format(root.title or "", root.desc or "")
@@ -71,11 +73,12 @@ Builder.load_string("""
                 color: app.theme.text
             BoxLayout:
                 id: content
-                size_hint_x: .33
+                size_hint_x: 1 - root.label_size_hint_x
         Widget:
             size_hint_x: .2
 
 <SettingAboutButton>:
+    label_size_hint_x: 0
     WideButton:
         text: "About This App"
         size: root.size
@@ -175,6 +178,10 @@ Builder.load_string("""
         on_press: root.value = '0' if self.state == 'normal' else '1'
         text: root.true_text if root.value == '1' else root.false_text
 """)
+
+
+class SettingItem(SettingItemOriginal):
+    label_size_hint_x = NumericProperty(0.66)
 
 
 class SettingOptions(SettingItem, Navigation):
