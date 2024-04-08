@@ -124,6 +124,8 @@ class Theme(Widget):
 class NormalApp(App):
     theme_index = NumericProperty(0)  #Override this to create an app with a different theme index
     popup_x = NumericProperty(640)  #Override this to set the default width of popups
+    popup_size_hint_x = NumericProperty(None, allownone=True)
+    about_title = "About This App"  #Title that will appear in the about popup
     about_text = 'About'  #Override this to change the text that appears in the the about popup in the settings screen
     animations = BooleanProperty(True)  #Set this to disable animations in the app
     animation_length = NumericProperty(0.2)  #Set this to change the length in seconds that animations will take
@@ -556,9 +558,11 @@ class NormalApp(App):
     def about(self):
         """Opens a special message popup with the app's about text in it"""
 
-        title = "About This App"
-        text = self.about_text
-        self.message_popup(text, title=title)
+        if self.popup:
+            self.popup.dismiss()
+        self.popup = AboutPopup(size_hint=(self.popup_size_hint_x, None), width=self.popup_x)
+        self.popup.open()
+        #self.message_popup(text, title=title)
 
     def message_popup(self, text, title='Notification'):
         """Opens a basic message popup with an ok button"""
@@ -566,7 +570,7 @@ class NormalApp(App):
         if self.popup:
             self.popup.dismiss()
         content = MessagePopupContent(text=text)
-        self.popup = NormalPopup(title=title, content=content, size_hint=(None, None), size=(self.popup_x, self.button_scale * 4))
+        self.popup = NormalPopup(title=title, content=content, size_hint=(self.popup_size_hint_x, None), size=(self.popup_x, self.button_scale * 4))
         self.popup.open()
 
     def build_config(self, config):

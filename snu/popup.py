@@ -34,6 +34,7 @@ Builder.load_string("""
     cols:1
     NormalLabel:
         text: root.text
+        text_size: root.size
     Label:
     GridLayout:
         cols:1

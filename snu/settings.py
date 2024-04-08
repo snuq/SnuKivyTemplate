@@ -87,39 +87,22 @@ Builder.load_string("""
         on_release: app.about()
 
 <AboutPopup>:
-    canvas.before:
-        Color:
-            rgba: 0, 0, 0, .75 * self._anim_alpha
-        Rectangle:
-            size: self._window.size if self._window else (0, 0)
-        Color:
-            rgba: app.theme.sidebar_background
-        Rectangle:
-            size: self.size
-            pos: self.pos
-            source: 'data/panelbg.png'
-    background_color: 1, 1, 1, 0
-    background: 'data/transparent.png'
+    background_color: app.theme.menu_background
+    background: 'data/panelbg.png'
     separator_color: 1, 1, 1, .25
     title_size: app.text_scale * 1.25
     title_color: app.theme.header_text
-    size_hint: .5, None
+    title: app.about_title
+    size_hint: app.popup_size_hint_x, None
     height: self.width/2
     BoxLayout:
         orientation: 'vertical'
-        BoxLayout:
-            orientation: 'horizontal'
-            Image:
-                source: 'data/icon.png'
-                size_hint_x: None
-                size_hint_y: 1
-                width: self.height
-            Scroller:
-                do_scroll_x: False
-                ShortLabel:
-                    size_hint_y: None
-                    height: self.texture_size[1] + 20
-                    text: app.about_text
+        Scroller:
+            do_scroll_x: False
+            ShortLabel:
+                size_hint_y: None
+                height: self.texture_size[1] + 20
+                text: app.about_text
         WideButton:
             id: button
             text: root.button_text
