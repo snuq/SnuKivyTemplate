@@ -135,12 +135,12 @@ class Theme(Widget):
 
 
 class SimpleTheme(Theme):
-    background = ListProperty()
-    text = ListProperty()
-    button_up = ListProperty()
     button_down = ListProperty()
+    button_up = ListProperty()
+    text = ListProperty()
     selected = ListProperty()
     active = ListProperty()
+    background = ListProperty()
 
     def on_background(self, *_):
         self.header_background = self.background[:3]+[0.4]
