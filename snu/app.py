@@ -120,6 +120,64 @@ class Theme(Widget):
     background = ListProperty()
     selected_overlay = ListProperty()
 
+    def data_to_theme(self, data):
+        """Converts a theme dictionary into the theme object that is used for displaying colors"""
+
+        for color in data:
+            if hasattr(self, color):
+                new_color = data[color]
+                r = float(new_color[0])
+                g = float(new_color[1])
+                b = float(new_color[2])
+                a = float(new_color[3])
+                new_color = [r, g, b, a]
+                setattr(self, color, new_color)
+
+
+class SimpleTheme(Theme):
+    background = ListProperty()
+    text = ListProperty()
+    button_up = ListProperty()
+    button_down = ListProperty()
+    selected = ListProperty()
+    active = ListProperty()
+
+    def on_background(self, *_):
+        self.header_background = self.background[:3]+[0.4]
+        self.info_background = self.background[:3]+[0.7]
+        self.main_background = self.background[:3]+[0.3]
+        self.menu_background = self.background
+        self.slider_background = self.background
+
+    def on_text(self, *_):
+        self.button_text = self.text
+        self.info_text = self.text
+        self.header_text = self.text
+
+    def on_button_up(self, *_):
+        self.input_background = self.button_up
+        self.button_menu_up = self.button_up
+        self.button_toggle_false = self.button_up
+        self.button_disabled_text = self.button_up[:3]+[0.7]
+        self.disabled_text = self.button_up[:3]+[0.7]
+        self.slider_grabber = self.button_up
+
+    def on_button_down(self, *_):
+        self.button_disabled = self.btton_down[:3]+[0.7]
+        self.button_menu_down = self.button_down
+        self.scroller = self.button_down[:3]+[0.4]
+        self.button_warn_down = self.button_down
+
+    def on_selected(self, *_):
+        self.selected = self.selected[:3]+[0.7]
+        self.scroller_selected = self.selected[:3]+[0.9]
+        self.button_toggle_true = self.selected[:3]+[1]
+        self.selected_overlay = self.slected[:3]+[0.33]
+
+    def on_active(self, *_):
+        self.active = self.active[:3]+[0.5]
+        self.button_warn_up = self.active[:3]+[1]
+
 
 class NormalApp(App):
     theme_index = NumericProperty(0)  #Override this to create an app with a different theme index
@@ -438,25 +496,14 @@ class NormalApp(App):
         self.clickfade_object.begin(mode)
         Window.add_widget(self.clickfade_object)
 
-    def load_theme(self, theme_index):
+    def load_theme(self, theme):
         """Load and display a theme from the current presets"""
 
-        data = themes[theme_index]
-        self.data_to_theme(data)
-
-    def data_to_theme(self, data):
-        """Converts a theme dictionary into the theme object that is used for displaying colors"""
-
-        theme = self.theme
-        for color in data:
-            if hasattr(theme, color):
-                new_color = data[color]
-                r = float(new_color[0])
-                g = float(new_color[1])
-                b = float(new_color[2])
-                a = float(new_color[3])
-                new_color = [r, g, b, a]
-                setattr(theme, color, new_color)
+        try:
+            data = themes[theme]
+        except:
+            data = theme
+        self.theme.data_to_theme(data)
         self.button_update = not self.button_update
 
     def set_maximized(self, *_):
