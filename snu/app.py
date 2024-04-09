@@ -163,7 +163,7 @@ class SimpleTheme(Theme):
         self.slider_grabber = self.button_up
 
     def on_button_down(self, *_):
-        self.button_disabled = self.btton_down[:3]+[0.7]
+        self.button_disabled = self.button_down[:3]+[0.7]
         self.button_menu_down = self.button_down
         self.scroller = self.button_down[:3]+[0.4]
         self.button_warn_down = self.button_down
@@ -172,7 +172,7 @@ class SimpleTheme(Theme):
         self.selected = self.selected[:3]+[0.7]
         self.scroller_selected = self.selected[:3]+[0.9]
         self.button_toggle_true = self.selected[:3]+[1]
-        self.selected_overlay = self.slected[:3]+[0.33]
+        self.selected_overlay = self.selected[:3]+[0.33]
 
     def on_active(self, *_):
         self.active = self.active[:3]+[0.5]
