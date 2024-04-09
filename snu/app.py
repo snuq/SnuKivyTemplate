@@ -158,12 +158,12 @@ class SimpleTheme(Theme):
         self.input_background = self.button_up
         self.button_menu_up = self.button_up
         self.button_toggle_false = self.button_up
-        self.button_disabled_text = self.button_up[:3]+[0.7]
+        self.button_disabled_text = self.button_up
         self.disabled_text = self.button_up[:3]+[0.7]
         self.slider_grabber = self.button_up
 
     def on_button_down(self, *_):
-        self.button_disabled = self.button_down[:3]+[0.7]
+        self.button_disabled = self.button_down
         self.button_menu_down = self.button_down
         self.scroller = self.button_down[:3]+[0.4]
         self.button_warn_down = self.button_down
