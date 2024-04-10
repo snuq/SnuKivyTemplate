@@ -44,6 +44,8 @@ Builder.load_string("""
             size: self.size
         StencilUse
     canvas:
+        Color:
+            rgba: self.color
         Rectangle:
             texture: self.texture
             size: self.texture_size
