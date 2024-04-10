@@ -35,11 +35,11 @@ Builder.load_string("""
             source: 'data/mainbg.png'
     orientation: 'vertical'
     Header:
-        NormalButton:
-            text: 'Close Settings'
-            on_release: app.close_settings()
         HeaderLabel:
             text: "Settings"
+        NormalButton:
+            text: 'Close'
+            on_release: app.close_settings()
 
 <-SettingItem>:
     label_size_hint_x: 0.66
