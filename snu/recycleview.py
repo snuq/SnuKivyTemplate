@@ -120,6 +120,10 @@ class SelectableRecycleLayout(Widget):
     selects = ListProperty()
     multiselect = BooleanProperty(False)
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.register_event_type('on_click_node')
+
     def clear_selects(self):
         self.selects = []
 
@@ -188,6 +192,10 @@ class SelectableRecycleLayout(Widget):
                 self.deselect_all()
             self.select_node(node)
             self.selected = node.data
+        self.dispatch('on_click_node', node)
+
+    def on_click_node(self, node):
+        pass
 
     def remove_node(self, node):
         self.parent.data.pop(node.index)
