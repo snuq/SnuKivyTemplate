@@ -99,7 +99,8 @@ Builder.load_string("""
         orientation: 'vertical'
         Scroller:
             do_scroll_x: False
-            ShortLabel:
+            NormalLabel:
+                text_size: self.width, None
                 size_hint_y: None
                 height: self.texture_size[1] + 20
                 text: app.about_text
