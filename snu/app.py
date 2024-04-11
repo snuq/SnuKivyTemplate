@@ -630,8 +630,8 @@ class NormalApp(App):
                 'textsize': 100,
                 'scrollersize': 100,
                 'window_maximized': 0,
-                'window_top': 0,
-                'window_left': 0,
+                'window_top': 50,
+                'window_left': 100,
                 'window_width': 800,
                 'window_height': 600,
             })
