@@ -185,7 +185,8 @@ class SelectableRecycleLayout(Widget):
             if self.multiselect:
                 self.deselect_node(node)
             else:
-                pass
+                if self.selected != node.data:
+                    self.selected = node.data
                 #self.deselect_all()
         else:
             if not self.multiselect:
