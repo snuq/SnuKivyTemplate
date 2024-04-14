@@ -510,10 +510,12 @@ This function is called when the 'Enter' key is pressed in the text input field.
         press_enter: root.search
 
 ## snu.textinput.FloatInput
-Themed TextInput widget that limits inputted text to only numbers and a single period.
+Themed TextInput widget that limits inputted text to only numbers and a single period.  
+Features 'allow_negative' boolean option, set to False to prevent negative numbers.
 
 ## snu.textinput.IntegerInput
-Themed TextInput widget that limits inputted text to numbers only.
+Themed TextInput widget that limits inputted text to numbers only.  
+Features 'allow_negative' boolean option, set to False to prevent negative numbers.
 
 <br/>
 

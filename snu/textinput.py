@@ -147,16 +147,18 @@ class NormalInput(TextInput, Navigation):
 class FloatInput(NormalInput):
     """Custom text input that only allows float numbers to be typed in.  Only allows numerals and one '.'"""
 
+    allow_negative = BooleanProperty(True)
     pat = re.compile('[^0-9]')
 
     def insert_text(self, substring, from_undo=False):
         pat = self.pat
-        if '-' in substring:
-            substring = substring.replace('-', '')
-            if '-' in self.text:
-                self.text = self.text.replace('-', '')
-            else:
-                self.text = '-' + self.text
+        if self.allow_negative:
+            if '-' in substring:
+                substring = substring.replace('-', '')
+                if '-' in self.text:
+                    self.text = self.text.replace('-', '')
+                else:
+                    self.text = '-' + self.text
         if '.' in self.text:
             s = re.sub(pat, '', substring)
         else:
@@ -167,16 +169,18 @@ class FloatInput(NormalInput):
 class IntegerInput(NormalInput):
     """Custom text input that only allows numbers to be typed in."""
 
+    allow_negative = BooleanProperty(True)
     pat = re.compile('[^0-9]')
 
     def insert_text(self, substring, from_undo=False):
         pat = self.pat
-        if '-' in substring:
-            substring = substring.replace('-', '')
-            if '-' in self.text:
-                self.text = self.text.replace('-', '')
-            else:
-                self.text = '-' + self.text
+        if self.allow_negative:
+            if '-' in substring:
+                substring = substring.replace('-', '')
+                if '-' in self.text:
+                    self.text = self.text.replace('-', '')
+                else:
+                    self.text = '-' + self.text
         s = re.sub(pat, '', substring)
         return super(IntegerInput, self).insert_text(s, from_undo=from_undo)
 
