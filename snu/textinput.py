@@ -74,18 +74,19 @@ Builder.load_string("""
     size_hint: None, None
     size: app.button_scale * 9, app.button_scale
     show_arrow: False
-    MenuButton:
-        text: 'Select All'
-        on_release: root.select_all()
-    MenuButton:
-        text: 'Cut'
-        on_release: root.cut()
-    MenuButton:
-        text: 'Copy'
-        on_release: root.copy()
-    MenuButton:
-        text: 'Paste'
-        on_release: root.paste()
+    BoxLayout:
+        MenuButton:
+            text: 'Select All'
+            on_release: root.select_all()
+        MenuButton:
+            text: 'Cut'
+            on_release: root.cut()
+        MenuButton:
+            text: 'Copy'
+            on_release: root.copy()
+        MenuButton:
+            text: 'Paste'
+            on_release: root.paste()
 """)
 
 
