@@ -98,6 +98,9 @@ class NormalInput(TextInput, Navigation):
     long_press_clock = None
     long_press_pos = None
 
+    def _show_cut_copy_paste(self, pos, win, parent_changed=False, mode='', pos_in_window=False, *l):
+        return
+
     def on_navigation_activate(self):
         self.focus = not self.focus
 
