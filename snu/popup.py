@@ -1,7 +1,7 @@
 from kivy.app import App
 from kivy.uix.popup import Popup
 from kivy.animation import Animation
-from kivy.properties import StringProperty, BooleanProperty
+from kivy.properties import StringProperty, BooleanProperty, ObjectProperty
 from kivy.uix.gridlayout import GridLayout
 from kivy.lang.builder import Builder
 Builder.load_string("""
@@ -33,9 +33,10 @@ Builder.load_string("""
 <MessagePopupContent>:
     cols:1
     NormalLabel:
+        text_size: self.size
+        size_hint_y: 1
+        valign: 'top'
         text: root.text
-        text_size: root.size
-    Label:
     GridLayout:
         cols:1
         size_hint_y: None
@@ -48,6 +49,9 @@ Builder.load_string("""
 <InputPopupContent>:
     cols:1
     NormalLabel:
+        text_size: self.size
+        size_hint_y: 1
+        valign: 'top'
         text: root.text
     NormalInput:
         id: input
@@ -55,7 +59,6 @@ Builder.load_string("""
         hint_text: root.hint
         text: root.input_text
         focus: True
-    Label:
     GridLayout:
         cols: 2
         size_hint_y: None
@@ -70,8 +73,10 @@ Builder.load_string("""
 <ConfirmPopupContent>:
     cols:1
     NormalLabel:
+        text_size: self.size
+        size_hint_y: 1
+        valign: 'top'
         text: root.text
-    Label:
     GridLayout:
         cols: 2
         size_hint_y: None
@@ -120,6 +125,7 @@ class MessagePopupContent(GridLayout):
 
     button_text = StringProperty('OK')
     text = StringProperty()
+    data = ObjectProperty()  #Generic variable that can store data to be passed in/out of popup
 
     def close(self, *_):
         app = App.get_running_app()
@@ -132,6 +138,7 @@ class InputPopupContent(GridLayout):
     input_text = StringProperty()
     text = StringProperty()  #Text that the user has input
     hint = StringProperty()  #Grayed-out hint text in the input field
+    data = ObjectProperty()  #Generic variable that can store data to be passed in/out of popup
 
     def __init__(self, **kwargs):
         self.register_event_type('on_answer')
@@ -149,6 +156,7 @@ class ConfirmPopupContent(GridLayout):
     no_text = StringProperty('No')
     warn_yes = BooleanProperty(False)
     warn_no = BooleanProperty(False)
+    data = ObjectProperty()  #Generic variable that can store data to be passed in/out of popup
 
     def __init__(self, **kwargs):
         self.register_event_type('on_answer')
