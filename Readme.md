@@ -326,6 +326,19 @@ Vertical BoxLayout that uses the mainbg image from the data directory as a backg
 <br/>
 
 # snu.popup Classes
+Popups can be easily created and themed using these classes.  
+```
+def delete_function(content, answer):
+    popup.dismiss()
+    if answer == "yes":
+        do_delete(content.data)
+
+content = ConfirmPopupContent(text="Are You Sure?", yes_text="Absolutely!", no_text="Wait...", warn_yes=True, data=stuff_to_delete)
+content.bind(on_answer=delete_function)
+popup = NormalPopup(title="Delete This?", content=content)
+popup.open()
+```
+
 
 #### snu.popup.NormalPopup
 Themed popup class using the panelbg image from the data directory and theme's menu_background color.  
