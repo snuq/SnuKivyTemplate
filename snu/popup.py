@@ -55,9 +55,11 @@ Builder.load_string("""
         text: root.text
     NormalInput:
         id: input
+        allow_mode: root.input_allow_mode
         multiline: False
         hint_text: root.hint
         text: root.input_text
+        on_text: root.input_text = self.text
         focus: True
     GridLayout:
         cols: 2
@@ -135,6 +137,7 @@ class MessagePopupContent(GridLayout):
 class InputPopupContent(GridLayout):
     """Basic text input popup message.  Calls 'on_answer' when either button is clicked."""
 
+    input_allow_mode = StringProperty()
     input_text = StringProperty()
     text = StringProperty()  #Text that the user has input
     hint = StringProperty()  #Grayed-out hint text in the input field

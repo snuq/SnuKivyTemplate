@@ -514,7 +514,13 @@ Subclass of kivy.uix.stencilview that limits touches to the stenciled area only.
 All text inputs default to being the standard button height, and are themed based on the theme colors.  
 
 ## snu.textinput.NormalInput
-Themed TextInput with some standard convenience settings.  No limitations on text to be entered, implements a right-click/long-press context menu for standard clipboard operations.  
+Themed TextInput with some standard convenience settings.  By default provides no limitations on text entered, implements a right-click/long-press context menu for standard clipboard operations.  
+
+#### NormalInput.allow_mode
+Set this to 'float', 'integer', 'filename' or 'url' to limit allowed characters to those modes.  See FloatInput and IntegerInput for more information.  
+
+#### NormalInput.allow_negative
+Boolean variable.  When allow_mode is set to 'float' or 'integer', this will allow negative numbers when set to True, or disallow when set to False.
 
 #### NormalInput.press_enter(String)
 This function is called when the 'Enter' key is pressed in the text input field.  This function will be passed the textinput widget, and the current text in the widget.   You can overwrite the function in your own subclass, or bind it to another function like so:

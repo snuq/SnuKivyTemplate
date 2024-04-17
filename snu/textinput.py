@@ -2,7 +2,7 @@ import re
 from kivy.app import App
 from kivy.uix.textinput import TextInput
 from kivy.clock import Clock
-from kivy.properties import NumericProperty, ObjectProperty, BooleanProperty
+from kivy.properties import NumericProperty, ObjectProperty, BooleanProperty, StringProperty
 from kivy.uix.bubble import Bubble
 from .navigation import Navigation
 from kivy.lang.builder import Builder
@@ -97,6 +97,8 @@ class NormalInput(TextInput, Navigation):
     long_press_time = NumericProperty(1)
     long_press_clock = None
     long_press_pos = None
+    allow_mode = StringProperty()
+    allow_negative = BooleanProperty(True)
 
     def _show_cut_copy_paste(self, pos, win, parent_changed=False, mode='', pos_in_window=False, *l):
         return
@@ -146,6 +148,38 @@ class NormalInput(TextInput, Navigation):
     def on_focus(self, *_):
         app = App.get_running_app()
         app.navigation_enabled = not self.focus
+
+    def insert_text(self, substring, from_undo=False):
+        if self.allow_mode.lower() == 'float':
+            pat = re.compile('[^0-9]')
+            if self.allow_negative:
+                if '-' in substring:
+                    substring = substring.replace('-', '')
+                    if '-' in self.text:
+                        self.text = self.text.replace('-', '')
+                    else:
+                        self.text = '-' + self.text
+            if '.' in self.text:
+                s = re.sub(pat, '', substring)
+            else:
+                s = '.'.join([re.sub(pat, '', s) for s in substring.split('.', 1)])
+        elif self.allow_mode.lower() == 'integer':
+            pat = re.compile('[^0-9]')
+            if self.allow_negative:
+                if '-' in substring:
+                    substring = substring.replace('-', '')
+                    if '-' in self.text:
+                        self.text = self.text.replace('-', '')
+                    else:
+                        self.text = '-' + self.text
+            s = re.sub(pat, '', substring)
+        elif self.allow_mode.lower() == 'filename':
+            s = "".join(i for i in substring if i not in "\\/:*?<>|")
+        elif self.allow_mode.lower() == 'url':
+            s = "".join(i for i in substring if i in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -._~!'()*")
+        else:
+            s = substring
+        return super().insert_text(s, from_undo=from_undo)
 
 
 class FloatInput(NormalInput):
