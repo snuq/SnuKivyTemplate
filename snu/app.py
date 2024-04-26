@@ -12,11 +12,14 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.modalview import ModalView
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.settings import Settings
+from kivy.utils import platform
 from .navigation import Navigation
 from .textinput import InputMenu
 from .popup import MessagePopupContent, NormalPopup
 from .button import ClickFade
 from .settings import *
+
+desktop = platform in ['win', 'linux', 'macosx', 'unknown']
 
 themes = [
     {
@@ -513,6 +516,8 @@ class NormalApp(App):
         self.window_maximized = False
 
     def set_window_size(self, load=True):
+        if not desktop:
+            return
         if load:
             self.load_window_size()
         if self.config.getboolean("Settings", "remember_window"):
