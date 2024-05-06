@@ -88,10 +88,16 @@ class RecycleItem(RecycleDataViewBehavior):
         if super(RecycleItem, self).on_touch_down(touch):
             return True
         if self.collide_point(*touch.pos):
-            self.parent.click_node(self)
-            if 'shift' in Window.modifiers:
-                self.parent.select_range(self.index, touch)
-            return True
+            touch.grab(self)
+
+    def on_touch_up(self, touch):
+        if touch.grab_current == self:
+            if self.collide_point(*touch.pos):
+                touch.ungrab(self)
+                self.parent.click_node(self)
+                if 'shift' in Window.modifiers:
+                    self.parent.select_range(self.index, touch)
+                return True
 
     def remove(self):
         if not self.animation:
