@@ -300,6 +300,8 @@ class NormalDropDown(DropDown):
         app = App.get_running_app()
         super(NormalDropDown, self).open(*args, **kwargs)
 
+        self.container.do_layout()
+        self._reposition()
         if app.animations:
             if self.basic_animation:
                 #Dont do fancy child opacity animation
