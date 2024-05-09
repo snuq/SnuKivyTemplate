@@ -54,7 +54,7 @@ Builder.load_string("""
         text: root.modified
 
 <FileBrowser>:
-    orientation: 'horizontal'
+    orientation: 'horizontal' if self.width > self.height else 'vertical'
     BoxLayout:
         orientation: 'vertical'
         Holder:
@@ -89,9 +89,15 @@ Builder.load_string("""
             height: app.button_scale if root.show_filename else 0
             text: ';'.join(root.selected)
             on_text: root.set_edit(self.text)
+    Widget:
+        size_hint: None, None
+        size: app.button_scale * 0.1, app.button_scale * 0.5
     BoxLayout:
-        size_hint_x: root.shortcuts_size
+        size_hint_x: root.shortcuts_size if root.width > root.height else 1
+        size_hint_y: 1
         orientation: 'vertical'
+        NormalLabel:
+            text: 'Locations:'
         NormalRecycleView:
             viewclass: 'FileBrowserItem'
             id: locationsList
