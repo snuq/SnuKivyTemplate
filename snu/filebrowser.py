@@ -61,7 +61,7 @@ Builder.load_string("""
             NormalButton:
                 text: 'Go Up'
                 on_release: root.go_up()
-            LeftNormalLabel:
+            TickerLabel:
                 text: root.folder
             NormalButton:
                 text: 'New Folder...'
