@@ -163,7 +163,7 @@ class NormalInput(TextInput, Navigation):
                 s = re.sub(pat, '', substring)
             else:
                 s = '.'.join([re.sub(pat, '', s) for s in substring.split('.', 1)])
-        elif self.allow_mode.lower() == 'integer':
+        elif self.allow_mode.lower() in ['int', 'integer']:
             pat = re.compile('[^0-9]')
             if self.allow_negative:
                 if '-' in substring:
@@ -173,10 +173,12 @@ class NormalInput(TextInput, Navigation):
                     else:
                         self.text = '-' + self.text
             s = re.sub(pat, '', substring)
-        elif self.allow_mode.lower() == 'filename':
+        elif self.allow_mode.lower() in ['file', 'filename']:
             s = "".join(i for i in substring if i not in "\\/:*?<>|")
         elif self.allow_mode.lower() == 'url':
             s = "".join(i for i in substring if i in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -._~!'()*")
+        elif self.allow_mode.lower() in ['hex', 'hexadecimal']:
+            s = "".join(i for i in substring if i in "0123456789ABCDEFabcdef")
         else:
             s = substring
         return super().insert_text(s, from_undo=from_undo)
