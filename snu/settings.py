@@ -94,7 +94,7 @@ Builder.load_string("""
     title_color: app.theme.header_text
     title: app.about_title
     size_hint: app.popup_size_hint_x, None
-    height: self.width/2
+    height: app.button_scale * 5
     BoxLayout:
         orientation: 'vertical'
         Scroller:
