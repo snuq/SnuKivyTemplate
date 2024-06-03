@@ -156,7 +156,10 @@ class SelectableRecycleLayout(Widget):
                 data['selected'] = True
                 selects.append(data)
         self.selects = selects
-        self.selected = selects[-1]
+        if selects:
+            self.selected = selects[-1]
+        else:
+            self.selected = {}
         self.refresh_selection()
 
     def select_node(self, node):
