@@ -113,7 +113,7 @@ class NormalInput(TextInput, Navigation):
         return super(NormalInput, self).on_touch_up(touch)
 
     def on_touch_down(self, touch):
-        if self.context_menu:
+        if self.context_menu and not self.disabled:
             if self.collide_point(*touch.pos):
                 pos = self.to_window(*touch.pos)
                 self.long_press_clock = Clock.schedule_once(self.do_long_press, self.long_press_time)
