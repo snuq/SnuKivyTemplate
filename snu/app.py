@@ -2,7 +2,7 @@ import os
 import time
 import json
 from kivy.app import App
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
 from kivy.logger import Logger, LoggerHistory
@@ -201,14 +201,14 @@ class NormalApp(App):
     display_padding = NumericProperty(8)
     display_border = NumericProperty(16)
     settings_cls = AppSettings
-    last_height = NumericProperty(0)
-    last_width = NumericProperty(0)
-    bubble = ObjectProperty(allownone=True)
-    window_top = NumericProperty(0)
-    window_left = NumericProperty(0)
-    window_width = NumericProperty(800)
-    window_height = NumericProperty(600)
+
+    window_top = None
+    window_left = None
+    window_width = None
+    window_height = None
     window_maximized = BooleanProperty(False)
+
+    bubble = ObjectProperty(allownone=True)
 
     clickfade_object = ObjectProperty()
     infotext = StringProperty('')
@@ -232,7 +232,8 @@ class NormalApp(App):
         super().__init__(**kwargs)
         self.theme = Theme()
         self.load_theme(self.theme_index)
-        Window.bind(on_draw=self.rescale_interface)
+        Window.bind(on_resize=self.window_on_size)
+        Window.bind(on_draw=self.window_on_draw)
         Window.bind(on_maximize=self.set_maximized)
         Window.bind(on_restore=self.unset_maximized)
 
@@ -515,58 +516,81 @@ class NormalApp(App):
     def unset_maximized(self, *_):
         self.window_maximized = False
 
-    def set_window_size(self, load=True):
-        if not desktop:
-            return
-        if load:
-            self.load_window_size()
-        if self.config.getboolean("Settings", "remember_window"):
-            if self.window_maximized:
-                Window.maximize()
-            else:
-                Window.left = self.window_left
-                Window.top = self.window_top
-                Window.size = (self.window_width, self.window_height)
-
-    def load_window_size(self):
-        self.window_maximized = self.config.getboolean('Settings', 'window_maximized')
+    def window_init_position(self, *_):
         self.window_top = int(self.config.get('Settings', 'window_top'))
         self.window_left = int(self.config.get('Settings', 'window_left'))
-        self.window_height = int(self.config.get('Settings', 'window_height'))
-        self.window_width = int(self.config.get('Settings', 'window_width'))
+        Window.left = self.window_left
+        Window.top = self.window_top
 
-    def store_window_size(self):
-        self.config.set("Settings", "window_maximized", 1 if self.window_maximized else 0)
-        if self.window_maximized:
-            return
-        self.window_top = Window.top
-        self.window_left = Window.left
-        self.window_width = Window.size[0]
-        self.window_height = Window.size[1]
-        self.config.set('Settings', 'window_top', self.window_top)
-        self.config.set('Settings', 'window_left', self.window_left)
-        self.config.set('Settings', 'window_width', self.window_width)
-        self.config.set('Settings', 'window_height', self.window_height)
+    @mainthread
+    def window_on_size(self, *_):
+        #called when Window.on_resize happens
 
-    def rescale_interface(self, *_, force=False):
-        """Called when the window changes resolution, calculates variables dependent on screen size"""
+        if self.window_height is None:
+            #app just started, window is uninitialized, load in stored size if enabled
+            if self.config.getboolean("Settings", "remember_window"):
+                self.window_maximized = self.config.getboolean('Settings', 'window_maximized')
+                self.window_width = int(self.config.get('Settings', 'window_width'))
+                self.window_height = int(self.config.get('Settings', 'window_height'))
+                Window.size = (self.window_width, self.window_height)
+                if self.window_maximized:
+                    Window.maximize()
+                else:
+                    Clock.schedule_once(self.window_init_position)  #Need to delay this to ensure window has time to resize first
+            else:
+                self.window_width = Window.width
+                self.window_height = Window.height
+            self.rescale_interface()
+        else:
+            #Window is resized
+            self.config.set("Settings", "window_maximized", 1 if self.window_maximized else 0)
+            self.check_window_width()
+            self.check_window_height()
 
-        self.store_window_size()
-
-        if Window.width != self.last_width:
-            self.last_width = Window.width
+    def check_window_width(self, *_):
+        if Window.width != self.window_width and self.window_width is not None:
+            if not self.window_maximized:
+                self.window_width = Window.width
+                self.config.set('Settings', 'window_width', self.window_width)
             self.popup_x = min(Window.width, 640)
 
-        if (Window.height != self.last_height) or force:
-            self.last_height = Window.height
-            if self.scaling_mode == 'divisions':
-                self.button_scale = int((Window.height / self.scale_amount) * int(self.config.get("Settings", "buttonsize")) / 100)
-            elif self.scaling_mode == 'pixels':
-                self.button_scale = int(self.scale_amount * (int(self.config.get("Settings", "buttonsize")) / 100))
-            self.text_scale = int((self.button_scale / 3) * int(self.config.get("Settings", "textsize")) / 100)
-            self.scrollbar_scale = int(((self.button_scale / 2) * (int(self.config.get("Settings", "scrollersize")) / 100)))
-            self.display_border = self.button_scale / 3
-            self.display_padding = self.button_scale / 4
+    def check_window_height(self, *_):
+        if Window.height != self.window_height and self.window_height is not None:
+            if not self.window_maximized:
+                self.window_height = Window.height
+                self.config.set('Settings', 'window_height', self.window_height)
+            self.rescale_interface()
+
+    def check_window_top(self, *_):
+        if Window.top != self.window_top and self.window_top is not None:
+            if not self.window_maximized:
+                self.window_top = Window.top
+                self.config.set('Settings', 'window_top', self.window_top)
+
+    def check_window_left(self, *_):
+        if Window.left != self.window_left and self.window_left is not None:
+            if not self.window_maximized:
+                self.window_left = Window.left
+                self.config.set('Settings', 'window_left', self.window_left)
+
+    @mainthread
+    def window_on_draw(self, *_):
+        if self.window_height is None:
+            #trigger this just in case window hasnt triggered the on resize event
+            self.window_on_size()
+        self.check_window_left()
+        self.check_window_top()
+
+    def rescale_interface(self, *_):
+        """Updates variables dependent on screen height"""
+        if self.scaling_mode == 'divisions':
+            self.button_scale = int((Window.height / self.scale_amount) * int(self.config.get("Settings", "buttonsize")) / 100)
+        elif self.scaling_mode == 'pixels':
+            self.button_scale = int(self.scale_amount * (int(self.config.get("Settings", "buttonsize")) / 100))
+        self.text_scale = int((self.button_scale / 3) * int(self.config.get("Settings", "textsize")) / 100)
+        self.scrollbar_scale = int(((self.button_scale / 2) * (int(self.config.get("Settings", "scrollersize")) / 100)))
+        self.display_border = self.button_scale / 3
+        self.display_padding = self.button_scale / 4
 
     def popup_bubble(self, text_input, pos):
         """Calls the text input right-click popup menu"""
@@ -689,7 +713,7 @@ class NormalApp(App):
     def on_config_change(self, config, section, key, value):
         """Called when the configuration file is changed"""
 
-        self.rescale_interface(force=True)
+        self.rescale_interface()
 
     def get_crashlog_file(self):
         """Returns the crashlog file path and name"""

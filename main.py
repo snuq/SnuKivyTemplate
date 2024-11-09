@@ -101,7 +101,6 @@ class Test(NormalApp):
     def on_start(self):
         """Called when the app is started, after kv files are loaded"""
 
-        self.set_window_size()
         self.start_keyboard_navigation()
         self.start_joystick_navigation()
         self.load_theme(1)
