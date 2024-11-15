@@ -1,6 +1,4 @@
 import re
-
-from PIL.ImageEnhance import Color
 from kivy.app import App
 from kivy.animation import Animation
 from kivy.uix.label import Label
@@ -11,29 +9,7 @@ from kivy.uix.bubble import Bubble
 from .navigation import Navigation
 from kivy.lang.builder import Builder
 Builder.load_string("""
-<-TextInput>:
-    canvas.before:
-        Color:
-            rgba: self.background_color
-        BorderImage:
-            display_border: [app.display_border/2, app.display_border/2, app.display_border/2, app.display_border/2]
-            border: self.border
-            pos: self.pos[0] + 3, self.pos[1] + 3
-            size: self.size[0] -6, self.size[1] - 6
-            source: self.background_active if self.focus else (self.background_disabled_normal if self.disabled else self.background_normal)
-        Color:
-            rgba:
-                (self.cursor_color
-                if self.focus and not self._cursor_blink
-                else (0, 0, 0, 0))
-        Rectangle:
-            pos: self._cursor_visual_pos
-            size: root.cursor_width, -self._cursor_visual_height
-        Color:
-            rgba: self.disabled_foreground_color if self.disabled else (self.hint_text_color if not self.text else self.foreground_color)
-    padding: app.display_padding
-
-<-NormalInput>:
+<NormalInput>:
     canvas.before:
         Color:
             rgba: self._current_background_color
