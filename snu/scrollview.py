@@ -21,12 +21,12 @@ Builder.load_string("""
     _handle_x_size: self.width * self.hbar[1], self.height
     canvas:
         Color:
-            rgba: self._bar_color if (self.viewport_size[0] > self.scroller_size[0]) else [0, 0, 0, 0]
+            rgba: self._bar_color if self.is_active else [0, 0, 0, 0]
         RoundedRectangle:
             radius: [self.rounding]
             pos: root._handle_x_pos or (0, 0)
             size: root._handle_x_size or (0, 0)
-    is_active: not self.viewport_size[0] <= self.scroller_size[0]
+    is_active: self.viewport_size[0] > self.scroller_size[0]
     bar_color: app.theme.scroller_selected
     bar_inactive_color: app.theme.scroller
     size_hint_y: None
@@ -39,12 +39,12 @@ Builder.load_string("""
     _handle_y_size: self.width, self.height * self.vbar[1]
     canvas:
         Color:
-            rgba: self._bar_color if (self.viewport_size[1] > self.scroller_size[1]) else [0, 0, 0, 0]
+            rgba: self._bar_color if self.is_active else [0, 0, 0, 0]
         RoundedRectangle:
             radius: [self.rounding]
             pos: root._handle_y_pos or (0, 0)
             size: root._handle_y_size or (0, 0)
-    is_active: not self.viewport_size[1] <= self.scroller_size[1]
+    is_active: self.viewport_size[1] > self.scroller_size[1]
     bar_color: app.theme.scroller_selected
     bar_inactive_color: app.theme.scroller
     size_hint_x: None
