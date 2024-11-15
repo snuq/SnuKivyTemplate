@@ -99,55 +99,43 @@ class ScrollBar(BoxLayout):
 
     scroll = NumericProperty()
     scroller = ObjectProperty(allownone=True)
+    scroller_size = ListProperty([0, 0])
+    rounding = NumericProperty(0)
+    is_active = BooleanProperty(True)
+
+    # borrow some functions and variables from ScrollView
     scroll_wheel_distance = NumericProperty('20sp')
     bar_color = ColorProperty([.7, .7, .7, .9])
     bar_inactive_color = ColorProperty([.7, .7, .7, .2])
     viewport_size = ListProperty([0, 0])
-    scroller_size = ListProperty([0, 0])
-    rounding = NumericProperty(0)
-    is_active = BooleanProperty(True)
-    autohide = BooleanProperty(True)
-
     _bar_color = ListProperty([0, 0, 0, 0])
     _bind_inactive_bar_color_ev = None
-
-    def _set_scroller_size(self, instance, value):
-        self.scroller_size = value
-
-    def _set_viewport_size(self, instance, value):
-        self.viewport_size = value
-
-    def _set_scroll(self, instance, value):
-        self.scroll = value
-
-    def _bind_inactive_bar_color(self, *l):
-        self.funbind('bar_color', self._change_bar_color)
-        self.fbind('bar_inactive_color', self._change_bar_color)
-        Animation(_bar_color=self.bar_inactive_color, d=.5, t='out_quart').start(self)
-
-    def _change_bar_color(self, inst, value):
-        self._bar_color = value
+    _set_viewport_size = ScrollView._set_viewport_size
+    _bind_inactive_bar_color = ScrollView._bind_inactive_bar_color
+    _change_bar_color = ScrollView._change_bar_color
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.update_bar_color()
 
+    def _set_scroller_size(self, instance, value):
+        self.scroller_size = value
+
+    def _set_scroll(self, instance, value):
+        self.scroll = value
+
     def jump_bar(self, pos):
+        # Placeholder for subclassed jump-to function, can scroll to a different location in the scrollbar without dragging
         pass
 
     def on_touch_down(self, touch):
         if not self.disabled and self.collide_point(*touch.pos):
-            self.jump_bar(touch.pos)
-            touch.grab(self)
             if 'button' in touch.profile and touch.button.startswith('scroll'):
                 btn = touch.button
-                scroll_direction = ''
-                if btn in ('scrollup', 'scrollright'):
-                    scroll_direction = 'up'
-                elif btn in ('scrolldown', 'scrollleft'):
-                    scroll_direction = 'down'
-                return self.wheel_scroll(scroll_direction)
+                return self.wheel_scroll(btn)
 
+            self.jump_bar(touch.pos)
+            touch.grab(self)
             self.do_touch_scroll(touch)
             return True
 
@@ -156,9 +144,12 @@ class ScrollBar(BoxLayout):
             self.do_touch_scroll(touch)
 
     def do_touch_scroll(self, touch):
+        # Touch events should activate scrolling
+        # Splitting this into its own function to make it easier to subclass
         pass
 
     def on_scroller(self, instance, value):
+        # The scroller object has been set, create binds and set up local variables
         if value:
             value.bind(size=self._set_scroller_size)
             value.bind(viewport_size=self._set_viewport_size)
@@ -166,6 +157,7 @@ class ScrollBar(BoxLayout):
             self.viewport_size = value.viewport_size
 
     def update_bar_color(self):
+        # in original code, this was in update_from_scroll, but that extra code is not needed
         ev = self._bind_inactive_bar_color_ev
         if ev is None:
             ev = self._bind_inactive_bar_color_ev = Clock.create_trigger(
@@ -176,45 +168,77 @@ class ScrollBar(BoxLayout):
         self._bar_color = self.bar_color
         ev()
 
+    def do_wheel_scroll(self, direction, scroll_axis):
+        scroll_up = ['scrollup', 'scrollright']
+        scroll_down = ['scrolldown', 'scrollleft']
+        if (direction in scroll_down and self.scroll >= 1) or (direction in scroll_up and self.scroll <= 0):
+            return False
+
+        if self.viewport_size[scroll_axis] > self.scroller_size[scroll_axis]:
+            scroll_percent = self.scroll_wheel_distance / self.viewport_size[scroll_axis]
+            if direction in scroll_up:
+                new_scroll = self.scroll - scroll_percent
+            elif direction in scroll_down:
+                new_scroll = self.scroll + scroll_percent
+            else:
+                return False
+            self.scroll = min(max(new_scroll, 0), 1)
+            return True
+        return False
+
     def wheel_scroll(self, direction):
         return False
+
+    def _get_bar(self, axis, min_size):
+        viewport_size = self.viewport_size[axis]
+        scroller_size = self.scroller_size[axis]
+        if viewport_size < scroller_size or viewport_size == 0:
+            # not large enough to scroll
+            return 0, 1.
+        bar_length = max(min_size, scroller_size / float(viewport_size))
+        scroll = min(1.0, max(0.0, self.scroll))
+        bar_pos = (1. - bar_length) * scroll
+        return bar_pos, bar_length
+
+    def _get_vbar(self):
+        if self.height > 0:
+            min_height = self.width / self.height  # prevent scroller size from being too small
+        else:
+            min_height = 0
+        return self._get_bar(1, min_height)
+
+    vbar = AliasProperty(_get_vbar, bind=('scroller_size', 'scroll', 'viewport_size', 'height'), cache=True)
+
+    def _get_hbar(self):
+        if self.width > 0:
+            min_width = self.height / self.width  # prevent scroller size from being too small
+        else:
+            min_width = 0
+        return self._get_bar(0, min_width)
+
+    hbar = AliasProperty(_get_hbar, bind=('scroller_size', 'scroll', 'viewport_size', 'width'), cache=True)
+
+    def in_bar(self, click_pos, self_pos, self_size, bar):
+        local_pos = click_pos - self_pos
+        click_per = local_pos / self_size
+        bar_top = bar[0] + bar[1]
+        bar_bottom = bar[0]
+        half_bar_height = bar[1] / 2
+        if click_per > bar_top:
+            return click_per - bar_top + half_bar_height
+        elif click_per < bar_bottom:
+            return click_per - bar_bottom - half_bar_height
+        else:  # bar_top > click_per > bar_bottom:
+            return 0
 
 
 class ScrollBarX(ScrollBar):
     """Horizontal scrollbar widget.  See 'ScrollBar' for more information."""
 
     scroll = NumericProperty(0.)
-    def _get_hbar(self):
-        if self.width > 0:
-            min_width = self.height / self.width  #prevent scroller size from being too small
-        else:
-            min_width = 0
-        vw = self.viewport_size[0]
-        w = self.scroller_size[0]
-        if vw < w or vw == 0:
-            return 0, 1.
-        pw = max(min_width, w / float(vw))
-        sx = min(1.0, max(0.0, self.scroll))
-        px = (1. - pw) * sx
-        return px, pw
-    hbar = AliasProperty(_get_hbar, bind=('scroller_size', 'scroll', 'viewport_size', 'width'), cache=True)
-
-    def in_hbar(self, pos_x):
-        local_x = pos_x - self.x
-        local_per = local_x / self.width
-        hbar = self.hbar
-        hbar_top = hbar[0] + hbar[1]
-        hbar_bottom = hbar[0]
-        half_hbar_height = hbar[1] / 2
-        if local_per > hbar_top:
-            return local_per - hbar_top + half_hbar_height
-        elif local_per < hbar_bottom:
-            return local_per - hbar_bottom - half_hbar_height
-        else:  #hbar_top > local_per > hbar_bottom:
-            return 0
 
     def jump_bar(self, pos):
-        position = self.in_hbar(pos[0])
+        position = self.in_bar(pos[0], self.x, self.width, self.hbar)
         self.scroller.scroll_x += position
 
     def on_scroller(self, instance, value):
@@ -236,55 +260,16 @@ class ScrollBarX(ScrollBar):
         self.scroll = min(max(self.scroll + scroll_amount, 0.), 1.)
 
     def wheel_scroll(self, direction):
-        if (direction == 'up' and self.scroll >= 1) or (direction == 'down' and self.scroll <= 0):
-            return False
-
-        if self.viewport_size[0] > self.scroller_size[0]:
-            scroll_percent = self.scroll_wheel_distance / self.viewport_size[0]
-            if direction == 'up':
-                new_scroll = self.scroll - scroll_percent
-            else:
-                new_scroll = self.scroll + scroll_percent
-            self.scroll = min(max(new_scroll, 0), 1)
-            return True
-        return False
+        return self.do_wheel_scroll(direction, 0)
 
 
 class ScrollBarY(ScrollBar):
     """Vertical scrollbar widget.  See 'ScrollBar' for more information."""
 
     scroll = NumericProperty(1.)
-    def _get_vbar(self):
-        if self.height > 0:
-            min_height = self.width / self.height  #prevent scroller size from being too small
-        else:
-            min_height = 0
-        vh = self.viewport_size[1]
-        h = self.scroller_size[1]
-        if vh < h or vh == 0:
-            return 0, 1.
-        ph = max(min_height, h / float(vh))
-        sy = min(1.0, max(0.0, self.scroll))
-        py = (1. - ph) * sy
-        return py, ph
-    vbar = AliasProperty(_get_vbar, bind=('scroller_size', 'scroll', 'viewport_size', 'height'), cache=True)
-
-    def in_vbar(self, pos_y):
-        local_y = pos_y - self.y
-        local_per = local_y / self.height
-        vbar = self.vbar
-        vbar_top = vbar[0] + vbar[1]
-        vbar_bottom = vbar[0]
-        half_vbar_height = vbar[1] / 2
-        if local_per > vbar_top:
-            return local_per - vbar_top + half_vbar_height
-        elif local_per < vbar_bottom:
-            return local_per - vbar_bottom - half_vbar_height
-        else:  #vbar_top > local_per > vbar_bottom:
-            return 0
 
     def jump_bar(self, pos):
-        position = self.in_vbar(pos[1])
+        position = self.in_bar(pos[1], self.y, self.height, self.vbar)
         self.scroller.scroll_y += position
 
     def on_scroller(self, instance, value):
@@ -306,18 +291,7 @@ class ScrollBarY(ScrollBar):
         self.scroll = min(max(self.scroll + scroll_amount, 0.), 1.)
 
     def wheel_scroll(self, direction):
-        if (direction == 'up' and self.scroll >= 1) or (direction == 'down' and self.scroll <= 0):
-            return False
-
-        if self.viewport_size[1] > self.scroller_size[1]:
-            scroll_percent = self.scroll_wheel_distance / self.viewport_size[1]
-            if direction == 'up':
-                new_scroll = self.scroll - scroll_percent
-            else:
-                new_scroll = self.scroll + scroll_percent
-            self.scroll = min(max(new_scroll, 0), 1)
-            return True
-        return False
+        return self.do_wheel_scroll(direction, 1)
 
 
 class TouchScroller(ScrollView):
