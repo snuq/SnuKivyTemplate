@@ -548,11 +548,11 @@ class NormalApp(App):
             self.check_window_height()
 
     def check_window_width(self, *_):
+        self.popup_x = min(Window.width, 640)
         if Window.width != self.window_width and self.window_width is not None:
             if not self.window_maximized:
                 self.window_width = Window.width
                 self.config.set('Settings', 'window_width', self.window_width)
-            self.popup_x = min(Window.width, 640)
 
     def check_window_height(self, *_):
         if Window.height != self.window_height and self.window_height is not None:
