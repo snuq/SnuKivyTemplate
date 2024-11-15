@@ -546,6 +546,33 @@ All text inputs default to being the standard button height, and are themed base
 ## snu.textinput.NormalInput
 Themed TextInput with some standard convenience settings.  By default provides no limitations on text entered, implements a right-click/long-press context menu for standard clipboard operations.  
 
+#### NormalInput.underline_pos
+Horizontal position (float) from where the underline will grow from.  0 Will result in the line starting on the left, 0.5 from the center, and 1 from the right side.
+
+#### NormalInput.activate_time
+Time in seconds for the animate in effect.
+
+#### NormalInput.deactivate_time
+Time in seconds for the animate out effect.
+
+#### NormalInput.background_color
+Color that the input background will be when not active.
+
+#### NormalInput.background_color_active
+Color that the background will fade to when the text input is focused.
+
+#### NormalInput.background_border_color
+Color of the border line around the background.
+
+#### NormalInput.background_border_width
+Thickness of the border line around the background.
+
+#### NormalInput.rounded
+Radius of rounded corners on background.
+
+#### NormalInput.animate_hint
+Boolean variable.  When set to True, the hint text will animate to the top of the text input and remain visible.
+
 #### NormalInput.allow_mode
 Set this to 'float', 'integer', 'filename' or 'url' to limit allowed characters to those modes.  See FloatInput and IntegerInput for more information.  
 
