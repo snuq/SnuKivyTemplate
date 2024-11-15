@@ -32,7 +32,7 @@ Builder.load_string("""
     size_hint_y: None
     orientation: 'horizontal'
     height: 0 if (not self.is_active and self.autohide) else app.scrollbar_scale
-    opacity: 0 if (not self.is_active and self.autohide) else app.scrollbar_scale
+    opacity: 0 if (not self.is_active and self.autohide) else 1
 
 <ScrollBarY>:
     _handle_y_pos: self.x, self.y + self.height * self.vbar[0]
@@ -50,7 +50,7 @@ Builder.load_string("""
     size_hint_x: None
     orientation: 'vertical'
     width: 0 if (not self.is_active and self.autohide) else app.scrollbar_scale
-    opacity: 0 if (not self.is_active and self.autohide) else app.scrollbar_scale
+    opacity: 0 if (not self.is_active and self.autohide) else 1
 """)
 
 
