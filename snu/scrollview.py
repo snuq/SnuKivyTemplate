@@ -102,6 +102,7 @@ class ScrollBar(BoxLayout):
     scroller_size = ListProperty([0, 0])
     rounding = NumericProperty(0)
     is_active = BooleanProperty(True)
+    autohide = BooleanProperty(True)
 
     # borrow some functions and variables from ScrollView
     scroll_wheel_distance = NumericProperty('20sp')
