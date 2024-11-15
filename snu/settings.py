@@ -296,7 +296,7 @@ class SettingString(SettingItem, Navigation):
         content = InputPopupContent(text='', input_text=self.value)
         app = App.get_running_app()
         content.bind(on_answer=self._validate)
-        self.popup = NormalPopup(title=self.title, content=content, size_hint=(None, None), size=(app.popup_x, app.button_scale * 3.1), auto_dismiss=True)
+        self.popup = NormalPopup(title=self.title, content=content, size_hint=(None, None), size=(app.popup_x, app.button_scale * 3.5), auto_dismiss=True)
         app.popup = self.popup
         self.popup.open()
 
