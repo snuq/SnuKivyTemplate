@@ -1,7 +1,7 @@
 import re
 from kivy.app import App
 from kivy.animation import Animation
-from kivy.uix.label import Label
+from kivy.core.text import Label as CoreLabel
 from kivy.uix.textinput import TextInput
 from kivy.clock import Clock
 from kivy.properties import NumericProperty, ObjectProperty, BooleanProperty, StringProperty, ColorProperty, ListProperty, AliasProperty
@@ -14,14 +14,14 @@ Builder.load_string("""
         Color:
             rgba: self._current_background_color
         RoundedRectangle:
-            pos: self.pos
-            size: self.size
+            pos: self.x + self.background_padding, self.y + self.background_padding
+            size: self.width - (self.background_padding * 2), self.height - (self.background_padding * 2)
             radius: [self.rounded]
         Color:
             rgba: self.background_border_color
         Line:
             width: self.background_border_width
-            rounded_rectangle: (self.pos[0], self.pos[1], self.width, self.height, self.rounded)
+            rounded_rectangle: (self.x + self.background_padding, self.y + self.background_padding, self.width - (self.background_padding * 2), self.height - (self.background_padding * 2), self.rounded)
         Color:
             rgba: (self.cursor_color if self.focus and not self._cursor_blink and int(self.x + self.padding[0]) <= self._cursor_visual_pos[0] <= int(self.x + self.width - self.padding[2]) else (0, 0, 0, 0))
         Rectangle:
@@ -33,16 +33,16 @@ Builder.load_string("""
         Color:
             rgba: self.cursor_color if root._activated else (0, 0, 0, 0)
         Rectangle:  #underline
-            pos: self.x + (self.rounded / 2) + (self.width * self.underline_pos * (1 - self._activated)), self.y
-            size: (self.width - self.rounded) * self._activated, self._underline_size
+            pos: self.x + self.background_padding + (self.rounded / 2) + (self.width * self.underline_pos * (1 - self._activated)), self.y + self.background_padding
+            size: (self.width - self.rounded - (self.background_padding * 2)) * self._activated, self._underline_size
         Color:
             rgba: self.hint_text_color if root.animate_hint or not self.text else (0, 0, 0, 0)
         Rectangle:  #hint text
             size: self._hint_label_size
-            pos: self.x + self.padding[0], self.y + self.height - self._hint_label_size[1] - (self.height * .2 * (1 - self._activated_hint))
+            pos: self.x + self.padding[0], self.y + self.height - self._hint_label_size[1] - (self.padding[1] * (1 - (self._activated_hint / 2)))
             texture: self._hint_label_texture if self._hint_label_texture else None
     _underline_size: max(1, app.button_scale / 10)
-    padding: max(app.button_scale / 8, self.rounded), (self._hint_max_size * 0.3) + (app.button_scale / 8), max(app.button_scale / 8, self.rounded), app.button_scale / 8
+    padding: max(app.button_scale / 8, self.rounded) + self.background_padding, (self._hint_max_size * 0.3) + (app.button_scale / 8) + self.background_padding, max(app.button_scale / 8, self.rounded), app.button_scale / 8
     mipmap: True
     cursor_color: app.theme.text
     write_tab: False
@@ -50,7 +50,7 @@ Builder.load_string("""
     background_color_active: app.theme.input_background
     background_border_color: app.theme.text[:3]+[0.5]
     hint_text_color: app.theme.disabled_text
-    disabled_foreground_color: 1,1,1,.75
+    disabled_foreground_color: app.theme.text[:3]+[.75]
     foreground_color: app.theme.text
     size_hint_y: None
     height: app.button_scale
@@ -96,6 +96,7 @@ Builder.load_string("""
 class NormalInput(TextInput, Navigation):
     """Text input widget that adds a popup menu for normal text operations."""
 
+    background_padding = NumericProperty(4)
     hint_text = StringProperty("Enter Text")
     underline_pos = NumericProperty(0.5)  #Horizontal position (percent) from where the underline will grow from
     activate_time = NumericProperty(0.2)  #Time in seconds for the animate in
@@ -117,18 +118,17 @@ class NormalInput(TextInput, Navigation):
     _hint_min_size = NumericProperty(0)
     def update_hint_label(self):
         if not self._hint_label:
-            self._hint_label = Label(opacity=0, size_hint=(None, None), size=(0, 0))
-            #self._hint_label.
+            self._hint_label = CoreLabel(text='')
         self._hint_label.color = 1, 1, 1, 1
         self._hint_label.text = self.hint_text
         self._hint_max_size = min(self.font_size, self.height * 0.5)
         self._hint_min_size = self._hint_max_size * 0.5
         target_range = self._hint_max_size - self._hint_min_size
-        self._hint_label.font_size = self._hint_min_size + target_range * (1 - self._activated_hint)
-        self._hint_label.texture_update()
-        if self._hint_label._label.texture:
-            self._hint_label_size = self._hint_label._label.texture.size
-        return self._hint_label._label.texture
+        self._hint_label.options['font_size'] = self._hint_min_size + target_range * (1 - self._activated_hint)
+        self._hint_label.refresh()
+        if self._hint_label.texture:
+            self._hint_label_size = self._hint_label.texture.size
+        return self._hint_label.texture
     _hint_label_texture = AliasProperty(update_hint_label, bind=('size', 'font_size', 'hint_text_color', 'hint_text', '_activated_hint'))
     _hint_label_size = ListProperty([1, 1])
     context_menu = BooleanProperty(True)

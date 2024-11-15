@@ -83,6 +83,7 @@ Builder.load_string("""
                 id: files
                 multiselect: root.multi_select
         NormalInput:
+            hint_text: ''
             id: fileInputArea
             disabled: not root.show_filename or not root.edit_filename
             opacity: 1 if root.show_filename else 0
@@ -318,7 +319,7 @@ class FileBrowser(BoxLayout):
         else:
             #clickedon.type == 'file'
             if self.file_select:
-                self.update_selected_files()
+                Clock.schedule_once(self.update_selected_files)
 
     def double_click(self, clickedon):
         app = App.get_running_app()
