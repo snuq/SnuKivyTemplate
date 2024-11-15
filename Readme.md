@@ -373,19 +373,55 @@ Subclass of RecycleItem that includes a NormalLabel class, shown as an example f
 
 # snu.scrollview Classes
 
-#### snu.scrollview.Scroller
+## snu.scrollview.Scroller
 Themed subclass of ScrollView, scrollbar will be sized and colored based on theme settings.  
 
-#### snu.scrollview.ScrollViewCentered
+## snu.scrollview.ScrollViewCentered
 Subclass of Scroller, begins in a centered position.  
 
-#### snu.scrollview.ScrollWrapper
+## snu.scrollview.ScrollWrapper
 Subclass of Scroller, allows ScrollView clasess to be placed inside of it and still respond to touches.  Internal ScrollViews must be added to the 'masks' property, for example:
 
     <ScrollWrapper>:
         masks: [subscroller]
         Scroller:
             id: subscroller
+
+## snu.scrollview.TouchScroller
+Subclass of ScrollView, removes scrollbars and allows for finer control over touch events.
+
+#### TouchScroller.allow_middle_mouse
+Set this to True to enable scrolling with the middle mouse button (blocks middle mouse clicks on child widgets).
+
+#### TouchScroller.allow_flick
+Set this to True to enable touch 'flicks' to scroll the view (after touch release, scrolling will continue for a while).
+
+#### TouchScroller.allow_drag
+Set this to True to enable click-n-drag scrolling within the scrollview itself, stanndard touch-style scrolling.
+
+#### TouchScroller.allow_wheel
+Set this to True to enable scrolling via the mouse wheel or two-finger swipe scrolling.
+
+#### TouchScroller.masks
+ListProperty, add any child widgets to this, and they will receive all touches on them, blocking any touch controlls of this widget within their bounds.
+
+## snu.scrollview.ScrollBarX
+Implements a scrollbar as its own widget, completely separate from the scrollview.  This is intended to be used with TouchScroller, but can be used with any ScrollView-based class.  
+This scrollbar also includes some convencience features like clicking in the open area to scroll to that point, and limiting the minimum size of the scroll control to be no smaller than its width.
+
+#### ScrollBarX.scroller
+Should point to the ScrollView based widget that this scrollbar will control.
+
+#### ScrollBarX.rounding
+Apply a rounding of this number of pixels to the corners of the scroller control.
+
+#### ScrollBarX.is_active
+Will be set to True if the scroll area is large enough to be scrolled.
+
+#### ScrollBarX.autohide
+If set to True, this widget will shrink to 0 width if the scroll area is not large enough to be scrolled
+
+
 
 <br/>
 
