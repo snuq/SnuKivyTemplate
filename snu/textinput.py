@@ -9,7 +9,7 @@ from kivy.uix.bubble import Bubble
 from .navigation import Navigation
 from kivy.lang.builder import Builder
 Builder.load_string("""
-<NormalInput>:
+<-NormalInput>:
     canvas.before:
         Color:
             rgba: self._current_background_color
