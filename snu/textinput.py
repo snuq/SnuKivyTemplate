@@ -41,8 +41,8 @@ Builder.load_string("""
             size: self._hint_label_size
             pos: self.x + self.padding[0], self.y + self.height - self._hint_label_size[1] - (self.height * .2 * (1 - self._activated_hint))
             texture: self._hint_label_texture if self._hint_label_texture else None
-    _underline_size: max(1, self.height / 10)
-    padding: max(self.height / 8, self.rounded), (self._hint_max_size * 0.3) + (self.height / 8), max(self.height / 8, self.rounded), self.height / 8
+    _underline_size: max(1, app.button_scale / 10)
+    padding: max(app.button_scale / 8, self.rounded), (self._hint_max_size * 0.3) + (app.button_scale / 8), max(app.button_scale / 8, self.rounded), app.button_scale / 8
     mipmap: True
     cursor_color: app.theme.text
     write_tab: False
