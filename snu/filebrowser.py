@@ -500,8 +500,14 @@ class FileBrowser(BoxLayout):
                 if not self.show_hidden:
                     if filesystem.is_hidden(fullpath):
                         continue
-                file_size = int(os.path.getsize(fullpath))
-                modified = int(os.path.getmtime(fullpath))
+                try:
+                    file_size = int(os.path.getsize(fullpath))
+                except:
+                    file_size = 0
+                try:
+                    modified = int(os.path.getmtime(fullpath))
+                except:
+                    modified = 0
                 file_data = {
                     'text': file,
                     'fullpath': fullpath,
