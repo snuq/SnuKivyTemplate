@@ -528,7 +528,7 @@ class NormalApp(App):
 
         if self.window_height is None:
             #app just started, window is uninitialized, load in stored size if enabled
-            if self.config.getboolean("Settings", "remember_window"):
+            if self.config.getboolean("Settings", "remember_window") and desktop:
                 self.window_maximized = self.config.getboolean('Settings', 'window_maximized')
                 self.window_width = int(self.config.get('Settings', 'window_width'))
                 self.window_height = int(self.config.get('Settings', 'window_height'))
@@ -701,13 +701,14 @@ class NormalApp(App):
             "section": "Settings",
             "key": "scrollersize"
         })
-        settingspanel.append({
-            "type": "bool",
-            "title": "Remember Window",
-            "desc": "Recall the last used window size and position on startup",
-            "section": "Settings",
-            "key": "remember_window"
-        })
+        if desktop:
+            settingspanel.append({
+                "type": "bool",
+                "title": "Remember Window",
+                "desc": "Recall the last used window size and position on startup",
+                "section": "Settings",
+                "key": "remember_window"
+            })
         settings.add_json_panel('Settings', self.config, data=json.dumps(settingspanel))
 
     def on_config_change(self, config, section, key, value):
