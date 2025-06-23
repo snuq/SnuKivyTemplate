@@ -517,6 +517,7 @@ class NormalApp(App):
         self.window_maximized = False
 
     def window_init_position(self, *_):
+        #Set window position from saved settings
         self.window_top = int(self.config.get('Settings', 'window_top'))
         self.window_left = int(self.config.get('Settings', 'window_left'))
         Window.left = self.window_left
@@ -538,53 +539,47 @@ class NormalApp(App):
                 else:
                     Clock.schedule_once(self.window_init_position)  #Need to delay this to ensure window has time to resize first
             else:
-                self.window_width = Window.width
-                self.window_height = Window.height
-            self.rescale_interface()
+                self.window_width = Window.size[0]
+                self.window_height = Window.size[1]
+            self.rescale_interface(height=self.window_height)  #Need to pass in actual window height because Window.size isnt always showing correct size yet
         else:
-            #Window is resized
+            #Window is resized by user
             self.config.set("Settings", "window_maximized", 1 if self.window_maximized else 0)
-            self.check_window_width()
-            self.check_window_height()
+            self.check_window()
 
-    def check_window_width(self, *_):
-        self.popup_x = min(Window.width, 640)
-        if Window.width != self.window_width and self.window_width is not None:
+    def check_window(self, *_):
+        if Window.left != self.window_left and self.window_left is not None:  #Left changed
+            if not self.window_maximized:
+                self.window_left = Window.left
+                self.config.set('Settings', 'window_left', self.window_left)
+        if Window.top != self.window_top and self.window_top is not None:  #Top changed
+            if not self.window_maximized:
+                self.window_top = Window.top
+                self.config.set('Settings', 'window_top', self.window_top)
+        self.popup_x = Window.width
+        if Window.width != self.window_width and self.window_width is not None:  #Width changed
             if not self.window_maximized:
                 self.window_width = Window.width
                 self.config.set('Settings', 'window_width', self.window_width)
-
-    def check_window_height(self, *_):
-        if Window.height != self.window_height and self.window_height is not None:
+        if Window.height != self.window_height and self.window_height is not None:  #Height changed
             if not self.window_maximized:
                 self.window_height = Window.height
                 self.config.set('Settings', 'window_height', self.window_height)
             self.rescale_interface()
 
-    def check_window_top(self, *_):
-        if Window.top != self.window_top and self.window_top is not None:
-            if not self.window_maximized:
-                self.window_top = Window.top
-                self.config.set('Settings', 'window_top', self.window_top)
-
-    def check_window_left(self, *_):
-        if Window.left != self.window_left and self.window_left is not None:
-            if not self.window_maximized:
-                self.window_left = Window.left
-                self.config.set('Settings', 'window_left', self.window_left)
-
     @mainthread
     def window_on_draw(self, *_):
+        #need to have this because kivy on windows will not trigger Window.on_resize on startup...
         if self.window_height is None:
             #trigger this just in case window hasnt triggered the on resize event
             self.window_on_size()
-        self.check_window_left()
-        self.check_window_top()
 
-    def rescale_interface(self, *_):
+    def rescale_interface(self, height=None):
         """Updates variables dependent on screen height"""
+        if height is None:
+            height = Window.size[1]
         if self.scaling_mode == 'divisions':
-            self.button_scale = int((Window.height / self.scale_amount) * int(self.config.get("Settings", "buttonsize")) / 100)
+            self.button_scale = int((height / self.scale_amount) * int(self.config.get("Settings", "buttonsize")) / 100)
         elif self.scaling_mode == 'pixels':
             self.button_scale = int(self.scale_amount * (int(self.config.get("Settings", "buttonsize")) / 100))
         self.text_scale = int((self.button_scale / 3) * int(self.config.get("Settings", "textsize")) / 100)
