@@ -515,6 +515,7 @@ class NormalApp(App):
 
     def unset_maximized(self, *_):
         self.window_maximized = False
+        self.rescale_interface()
 
     def window_init_position(self, *_):
         #Set window position from saved settings
