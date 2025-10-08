@@ -104,6 +104,18 @@ Builder.load_string("""
             id: locationsList
             data: root.shortcuts_data
             SelectableRecycleBoxLayout:
+        NormalLabel:
+            enabled: extraOptions.height > 0
+            text: root.extra_options_label if self.enabled else ''
+            height: app.button_scale if self.enabled else 0
+            opacity: 1 if self.enabled else 0
+        BoxLayout:
+            id: extraOptions
+            size_hint_y: None
+            height: self.minimum_height
+        Widget:
+            size_hint_y: None
+            height: app.button_scale * 0.5
         WideButton:
             text: root.cancel_text
             disabled: not root.show_cancel
@@ -256,6 +268,7 @@ class FileBrowser(BoxLayout):
     show_select = BooleanProperty(True)  #Show the select button
     show_folder_edit = BooleanProperty(True)  #Display the folder creation/delete buttons
     show_filename = BooleanProperty(True)  #Shows the selected filename(s) in a text field
+    extra_options_label = StringProperty('File Options: ')
 
     #Behavior settings:
     file_select = BooleanProperty(True)  #Allows the dialog to select a filename
@@ -467,8 +480,12 @@ class FileBrowser(BoxLayout):
         dirs = sorted(dirs, key=lambda s: s.lower())
 
         #Sort directory list
+        filesystem = FileSystemLocal()
         for directory in dirs:
             fullpath = os.path.join(self.folder, directory)
+            if not self.show_hidden:
+                if filesystem.is_hidden(fullpath):
+                    continue
             data.append({
                 'text': directory,
                 'fullpath': fullpath,
@@ -495,7 +512,6 @@ class FileBrowser(BoxLayout):
                 file_selected = True
             else:
                 file_selected = False
-            filesystem = FileSystemLocal()
             for file in files:
                 fullpath = os.path.join(self.folder, file)
                 if not self.show_hidden:
