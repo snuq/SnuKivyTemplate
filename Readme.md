@@ -136,6 +136,9 @@ This function will attempt to activate the 'increase' function for the current s
 #### NormalApp.selected_skip()
 This function will skip to the next recycleview if inside one, otherwise it will go to the next selectable item in the tree.  
 
+#### NormalApp.selected_pgup(), NormalApp.selected_pgdown(), NormalApp.selected_home(), NormalApp.selecte_end()
+These functions do nothing by default, but can be used to implement more complex navigation within a widget.  
+
 #### NormalApp.selected_clear()
 This function will properly unset the current selected item.  Please do not simply set "NormalApp.selected_object = None" as this will not tell the widget it has been deselected.  
 
@@ -156,6 +159,18 @@ This is a list containing scancodes to use for decreasing the value of a selecte
 
 #### NormalApp.navigation_jump
 This is a list containing scancodes to use for jumping out of a recycleview list of selectable widgets.  This defaults to the keyboard Tab key.  
+
+#### NormalApp.navigation_pgdown
+This is a list containing scancodes to use for the 'Page Down' navigation.  
+
+#### NormalApp.navigation_pgup
+This is a list containing scancodes to use for the 'Page Up' navigation.  
+
+#### NormalApp.navigation_end
+This is a list containing scancodes to use for the 'End' navigation.
+
+#### NormalApp.navigation_home
+This is a list containing scancodes to use for the 'Home' navigation.
 
 #### NormalApp.joystick_deadzone
 This is a numeric property, range of 0-1.  This value represents the percentage of the joystick axis that is ignored.  Defaults to 0.25.  
@@ -183,6 +198,18 @@ This function is called on the selected widget before the next widget in the tre
 
 * on_navigation_prev()
 This function is called on the selected widget before the previous widget in the tree is navigated to.  Have this function return True to 'stick' the keyboard navigation to this widget, this is useful for enabling custom navigation of child widgets.  When the children have been navigated, have this function return False.  
+
+* on_navigation_pgdown()
+This function is called on the selected widget by the keys set in the navigation_pgdown list in the app.  Does nothing by default, override it to provide additional navigation functionality in complex widgets.  
+
+* on_navigation_pgup()
+This function is called on the selected widget by the keys set in the navigation_pgup list in the app.  Does nothing by default, override it to provide additional navigation functionality in complex widgets.  
+
+* on_navigation_end()
+This function is called on the selected widget by the keys set in the navigation_end list in the app.  Does nothing by default, override it to provide additional navigation functionality in complex widgets.  
+
+* on_navigation_home()
+This function is called on the selected widget by the keys set in the navigation_home list in the app.  Does nothing by default, override it to provide additional navigation functionality in complex widgets.  
 
 * on_navigation_select()  
 This function is called when a widget is selected.  This should not need to be overriden normally, but widgets with custom canvas.after code may have issues with the default function.  

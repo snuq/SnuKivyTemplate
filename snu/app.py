@@ -227,6 +227,10 @@ class NormalApp(App):
     navigation_left = [276, 13, -13]
     navigation_right = [275, 14, -14]
     navigation_jump = [9]
+    navigation_pgup = [280]
+    navigation_pgdown = [281]
+    navigation_home = [278]
+    navigation_end = [279]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -324,6 +328,18 @@ class NormalApp(App):
         elif scancode in self.navigation_jump:
             self.selected_skip()
             return True
+        elif scancode in self.navigation_pgup:
+            self.selected_pgup()
+            return True
+        elif scancode in self.navigation_pgdown:
+            self.selected_pgdown()
+            return True
+        elif scancode in self.navigation_home:
+            self.selected_home()
+            return True
+        elif scancode in self.navigation_end:
+            self.selected_end()
+            return True
 
     def nav_key_up(self, window, scancode=None, *_):
         pass
@@ -357,6 +373,22 @@ class NormalApp(App):
 
     def selected_skip(self, lookin=None):
         self.selected_item(lookin, True, skip=True)
+
+    def selected_pgup(self):
+        if self.selected_object:
+            self.selected_object.on_navigation_pgup()
+
+    def selected_pgdown(self):
+        if self.selected_object:
+            self.selected_object.on_navigation_pgdown()
+
+    def selected_home(self):
+        if self.selected_object:
+            self.selected_object.on_navigation_home()
+
+    def selected_end(self):
+        if self.selected_object:
+            self.selected_object.on_navigation_end()
 
     def selected_can_select(self, widget):
         if isinstance(widget, Navigation) and widget.navigation_selectable:

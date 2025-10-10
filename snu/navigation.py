@@ -38,6 +38,18 @@ class Navigation(Widget):
         #Override this function to allow the keyboard navigation 'left' to control this widget.
         pass
 
+    def on_navigation_pgup(self):
+        pass
+
+    def on_navigation_pgdown(self):
+        pass
+
+    def on_navigation_home(self):
+        pass
+
+    def on_navigation_end(self):
+        pass
+
     def on_navigation_select(self):
         app = App.get_running_app()
         self.navigation_overlay_color = Color(rgba=app.theme.selected_overlay)
