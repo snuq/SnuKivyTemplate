@@ -193,22 +193,22 @@ This function is called when the widget is selected and the 'navigation_right' k
 * on_navigation_decrease()  
 This function is called when the widget is selected and the 'navigation_left' key is pressed.  
 
-* on_navigation_next()
+* on_navigation_next()  
 This function is called on the selected widget before the next widget in the tree is navigated to.  Have this function return True to 'stick' the keyboard navigation to this widget, this is useful for enabling custom navigation of child widgets.  When the children have been navigated, have this function return False.  
 
-* on_navigation_prev()
+* on_navigation_prev()  
 This function is called on the selected widget before the previous widget in the tree is navigated to.  Have this function return True to 'stick' the keyboard navigation to this widget, this is useful for enabling custom navigation of child widgets.  When the children have been navigated, have this function return False.  
 
-* on_navigation_pgdown()
+* on_navigation_pgdown()  
 This function is called on the selected widget by the keys set in the navigation_pgdown list in the app.  Does nothing by default, override it to provide additional navigation functionality in complex widgets.  
 
-* on_navigation_pgup()
+* on_navigation_pgup()  
 This function is called on the selected widget by the keys set in the navigation_pgup list in the app.  Does nothing by default, override it to provide additional navigation functionality in complex widgets.  
 
-* on_navigation_end()
+* on_navigation_end()  
 This function is called on the selected widget by the keys set in the navigation_end list in the app.  Does nothing by default, override it to provide additional navigation functionality in complex widgets.  
 
-* on_navigation_home()
+* on_navigation_home()  
 This function is called on the selected widget by the keys set in the navigation_home list in the app.  Does nothing by default, override it to provide additional navigation functionality in complex widgets.  
 
 * on_navigation_select()  
