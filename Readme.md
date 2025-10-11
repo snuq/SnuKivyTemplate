@@ -110,7 +110,7 @@ When a widget is selected, press enter, or the first button on the joystick/game
 
 For widgets that can be adjusted with different values such as sliders or smoothsetting widgets, pressing the left/right arrow keys, or left/right on the joystick or gamepad dpad will cause this widget to raise or lower its variable.  
 
-For recycleviews with a lot of elements, it can be benefitial to jump out of the list, press the tab key to immediately jump to the next selectable widget out of the recycleview.  
+For recycleviews with a lot of elements, it can be benefitial to jump out of the list, press the tab key to immediately jump to the next selectable widget out of the recycleview, or press shift-tab to jump to the previous selectable widget.  
 
 #### NormalApp.start_keyboard_navigation()
 Calling this (suggested from your app's on_start() function) will tell the app to start listening to keyboard commands for navigating widgets.  
@@ -135,6 +135,9 @@ This function will attempt to activate the 'increase' function for the current s
 
 #### NormalApp.selected_skip()
 This function will skip to the next recycleview if inside one, otherwise it will go to the next selectable item in the tree.  
+
+#### NormalApp.selected_skip_back()
+Like selected_skip, but moves in the opposite direction in the widget tree.  
 
 #### NormalApp.selected_pgup(), NormalApp.selected_pgdown(), NormalApp.selected_home(), NormalApp.selecte_end()
 These functions do nothing by default, but can be used to implement more complex navigation within a widget.  

@@ -305,7 +305,7 @@ class NormalApp(App):
             self.nav_key_up(window, scancode=273)
             self.nav_key_up(window, scancode=274)
 
-    def nav_key_down(self, window, scancode=None, *_):
+    def nav_key_down(self, window, scancode=None, num=None, letter=None, modifiers=None):
         """Detects navigation-based key presses"""
 
         if not self.navigation_enabled:
@@ -326,7 +326,10 @@ class NormalApp(App):
             self.selected_right()
             return True
         elif scancode in self.navigation_jump:
-            self.selected_skip()
+            if 'shift' in modifiers:
+                self.selected_skip_back()
+            else:
+                self.selected_skip()
             return True
         elif scancode in self.navigation_pgup:
             self.selected_pgup()
@@ -373,6 +376,9 @@ class NormalApp(App):
 
     def selected_skip(self, lookin=None):
         self.selected_item(lookin, True, skip=True)
+
+    def selected_skip_back(self, lookin=None):
+        self.selected_item(lookin, False, skip=True)
 
     def selected_pgup(self):
         if self.selected_object:
