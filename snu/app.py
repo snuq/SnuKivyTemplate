@@ -499,7 +499,7 @@ class NormalApp(App):
     def selected_clear(self):
         self.selected_overlay_set(None)
 
-    def selected_overlay_set(self, widget):
+    def selected_overlay_set(self, widget, scroll_to=True):
         #This function will actually set the given widget as the current selected, also ensures it is scrolled to if in a Scroller
 
         if self.selected_object is not None:
@@ -508,7 +508,8 @@ class NormalApp(App):
         if widget is None:
             return
         self.selected_object.on_navigation_select()
-        self.selected_scroll_to_item(widget)
+        if scroll_to:
+            self.selected_scroll_to_item(widget)
 
     def selected_scroll_to_item(self, widget):
         parent = widget.parent
