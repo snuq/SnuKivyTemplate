@@ -502,8 +502,10 @@ class NormalApp(App):
     def selected_overlay_set(self, widget, scroll_to=True):
         #This function will actually set the given widget as the current selected, also ensures it is scrolled to if in a Scroller
 
-        if self.selected_object is not None:
+        try:
             self.selected_object.on_navigation_deselect()
+        except:
+            pass
         self.selected_object = widget
         if widget is None:
             return
