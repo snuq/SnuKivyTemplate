@@ -7,7 +7,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.utils import platform
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import BooleanProperty, StringProperty, ListProperty, NumericProperty, ObjectProperty
+from kivy.properties import BooleanProperty, StringProperty, ListProperty, NumericProperty, ObjectProperty, AliasProperty
 from kivy.uix.filechooser import FileSystemLocal
 from .popup import NormalPopup, InputPopupContent, ConfirmPopupContent
 from .layouts import Holder
@@ -36,9 +36,10 @@ Builder.load_string("""
             pos: self.pos
     height: app.button_scale
     Image:
+        color: app.theme.button_down
         size_hint_x: None
         width: app.button_scale
-        source: 'atlas://data/images/defaulttheme/filechooser_%s' % ('folder' if root.type == 'folder' else 'file')
+        source: root.source
     NormalLabel:
         size_hint_y: None
         height: app.button_scale
@@ -72,9 +73,13 @@ Builder.load_string("""
             NormalButton:
                 text: 'Delete Folder'
                 disabled: not root.show_folder_edit or not root.can_delete_folder
-                opacity: 1 if root.show_folder_edit else 0
-                width: self.texture_size[0] + app.button_scale if root.show_folder_edit else 0
+                opacity: 0 if self.disabled else 1
+                width: 0 if self.disabled else self.texture_size[0] + app.button_scale
                 on_release: root.delete_folder()
+            NormalToggle:
+                text: 'Favorited' if root.is_favorite else 'Set Favorite'
+                on_release: root.favorite_folder()
+                state: 'down' if root.is_favorite else 'normal'
         NormalRecycleView:
             viewclass: 'FileBrowserItem'
             id: fileList
@@ -228,6 +233,16 @@ class FileBrowserItem(RecycleItem, BoxLayout, Navigation):
     selectable = BooleanProperty(False)
     file_size = StringProperty()
     modified = StringProperty()
+    def _get_source(self):
+        if not self.type:
+            return 'data/transparent.png'
+        elif self.type == 'favorite':
+            return 'data/heart.png'
+        elif self.type in ['folder', 'shortcut']:
+            return 'data/folder.png'
+        else:
+            return 'data/file.png'
+    source = AliasProperty(_get_source, bind=('type',))
 
     def on_navigation_activate(self):
         if self.selectable:
@@ -237,7 +252,7 @@ class FileBrowserItem(RecycleItem, BoxLayout, Navigation):
     def on_selected(self, *_):
         if self.type == 'folder' and self.multi_select and self.selected:
             self.selected = False
-        if self.type == 'shortcut' and self.selected:
+        if self.type in ['shortcut', 'favorite'] and self.selected:
             self.selected = False
         self.set_color()
 
@@ -259,6 +274,7 @@ class FileBrowser(BoxLayout):
     filetypes_filter = ListProperty()  #Display only files with the given file extensions
     edited_selected = StringProperty('')
     default_filename = StringProperty('')
+    favorite_locations = ListProperty()
 
     #Theme variables:
     cancel_text = StringProperty('Cancel')
@@ -282,6 +298,7 @@ class FileBrowser(BoxLayout):
     clear_filename = BooleanProperty(True)  #Automatically clear the filename(s) when a folder is changed
 
     #Internal variables:
+    is_favorite = BooleanProperty(False)
     popup = ObjectProperty(allownone=True)
     shortcuts_data = ListProperty()
     file_list_data = ListProperty()
@@ -292,6 +309,7 @@ class FileBrowser(BoxLayout):
     def __init__(self, **kwargs):
         Clock.schedule_once(self.refresh_all)
         super().__init__(**kwargs)
+        self.load_favorites()
         if self.folder_select:
             self.selected = [self.folder]
 
@@ -315,7 +333,7 @@ class FileBrowser(BoxLayout):
     def single_click(self, clickedon):
         app = App.get_running_app()
         app.clickfade(clickedon)
-        if clickedon.type == 'shortcut':
+        if clickedon.type in ['shortcut', 'favorite']:
             self.folder = clickedon.fullpath
             self.refresh_folder()
             if self.folder_select:
@@ -442,23 +460,37 @@ class FileBrowser(BoxLayout):
         self.refresh_folder()
 
     def refresh_shortcuts(self, *_):
+        def get_location(loc_data, item_type='shortcut', selectable=True):
+            return {
+                'text': loc_data[1],
+                'fullpath': loc_data[0],
+                'type': item_type,
+                'is_folder': True,
+                'owner': self,
+                'selectable': selectable,
+                'selected': False
+            }
+        favorites = self.favorite_locations
         locations = get_drives()
         self.root_path = locations[0][0]
         data = []
+        for favorite in favorites:
+            data.append(get_location([favorite, favorite], item_type='favorite'))
+        if favorites:
+            data.append(get_location(['', ''], item_type='', selectable=False))
         for location in locations:
-            data.append({
-                'text': location[1],
-                'fullpath': location[0],
-                'type': 'shortcut',
-                'is_folder': True,
-                'owner': self,
-                'selectable': True,
-                'selected': False
-            })
+            data.append(get_location(location))
         self.shortcuts_data = []
         self.shortcuts_data = data
 
     def refresh_folder(self, *_):
+        realfolder = os.path.realpath(self.folder)
+        self.is_favorite = False
+        for favorite in self.favorite_locations:
+            if os.path.realpath(favorite) == realfolder:
+                self.is_favorite = True
+                break
+
         fileslayout = self.ids['files']
         fileslayout.selects = []
         fileslayout.selected = {}
@@ -550,3 +582,30 @@ class FileBrowser(BoxLayout):
     def reset_folder_scroll(self, *_):
         filelist = self.ids['fileList']
         filelist.scroll_y = 1
+
+    def favorite_folder(self):
+        realfolder = os.path.realpath(self.folder)
+        if not self.is_favorite:
+            self.favorite_locations.append(self.folder)
+        else:
+            for favorite in reversed(self.favorite_locations):
+                if os.path.realpath(favorite) == realfolder:
+                    self.favorite_locations.remove(favorite)
+        self.is_favorite = not self.is_favorite
+        self.refresh_shortcuts()
+        self.save_favorites()
+
+    def load_favorites(self):
+        self.favorite_locations = []
+        app = App.get_running_app()
+        if app.config.has_section("Favorite Locations"):
+            favorites = app.config.items("Favorite Locations")
+            for key, path in favorites:
+                self.favorite_locations.append(path)
+
+    def save_favorites(self):
+        app = App.get_running_app()
+        app.config.remove_section("Favorite Locations")
+        app.config.add_section("Favorite Locations")
+        for index, favorite in enumerate(self.favorite_locations):
+            app.config.set("Favorite Locations", str(index), favorite)

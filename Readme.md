@@ -473,7 +473,7 @@ Themed slider based on SpecialSlider.  Uses colors from the theme and the slider
 
 # snu.filebrowser.FileBrowser
 A widget that displays a navigable file browser layout complete with a sidebar for system folders and shortcuts.  Two events are called, on_select and on_cancel when the user clicks the select and cancel buttons.  
-![Fileselect](fileselect.gif)
+![Fileselect](fileselect.gif)  
 Due to the many different uses for a file browser, there are a lot of options available to control the behavior of this widget.  Unfortunately, some of these options can conflict with each other, so here are some examples.  
 The default settings are good for opening a single file, just use:
 
@@ -486,6 +486,9 @@ To select a folder to export a pre-defined file, use:
 To let the user select a folder to export a file that they define, use (note that you should check the 'edited_selected' value, not 'selected'):  
 
     FileBrowser(edit_filename=True, clear_filename=False, file_select=False, default_filename='default.txt')
+
+The filebrowser also supports 'favorite' locations.  These are stored in the app config under the "Favorite Locations" section.  Folders can be added or removed from favorites by navigating to them, and clicking the "Set Favorite"/"Favorited" toggle button.  If you wish to override the saving and loading, create a subclass of FileBrowser and add your own "load_favorites()" and "save_favorites()" functions.  
+
 
 #### FileBrowser.selected
 List Property.  This is the files or directories that the dialog selected.  Only the filename will be included, not the full path.  
@@ -517,7 +520,7 @@ Boolean Property, defaults to False.  Setting this to True allows multiple files
 Boolean Property, defaults to True.  Display files in the browser.  Setting this to False will result in only folders being shown.  
 
 #### FileBrowser.show_hidden
-Boolean Property, defaults to True.  Display hidden files when show_files is enabled.  
+Boolean Property, defaults to True.  Display hidden folders, and files when show_files is enabled.  
 
 #### FileBrowser.require_filename
 Boolean Property, defaults to True.  When this is True, the select button cannot be clicked if no file or folder is selected or provided.  
@@ -552,6 +555,9 @@ Boolean Property, defaults to True.  Setting this to False will hide the new fol
 
 #### FileBrowser.show_filename
 Boolean Property, defaults to True.  Setting this to False will hide the selected filename field.  This may be useful to hide for export dialogs, or for folder selection dialogs.  
+
+#### FileBrowser.extra_options_label
+String Property, defaults to "File Options: ".  After creating a FileBrowser, widgets can be added to the FileBrowser.ids.extraOptions BoxLayout that will appear on the right side under locations.  This label will become visible when a widget is added to that layout.  
 
 <br/>
 
