@@ -313,6 +313,10 @@ class FileBrowser(BoxLayout):
         if self.folder_select:
             self.selected = [self.folder]
 
+    def on_folder_select(self, *_):
+        if self.folder_select:
+            self.selected = [self.folder]
+
     def on_select(self):
         pass
 
