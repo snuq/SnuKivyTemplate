@@ -174,8 +174,8 @@ def get_drives():
     elif platform == 'linux':
         drives.append((os.path.sep, os.path.sep))
         drives.append((os.path.expanduser(u'~') + os.path.sep, 'Home'))
-        drives.append((os.path.sep + u'mnt' + os.path.sep, os.path.sep + u'mnt'))
-        places = (os.path.sep + u'mnt' + os.path.sep, os.path.sep + u'media')
+        drives.append((os.path.sep + u'mnt', os.path.sep + u'mnt'))
+        places = (os.path.sep + u'mnt', os.path.sep + u'media')
         for place in places:
             if os.path.isdir(place):
                 for directory in next(os.walk(place))[1]:

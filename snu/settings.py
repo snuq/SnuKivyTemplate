@@ -1,4 +1,8 @@
 import os
+try:
+    from os.path import sep
+except:
+    from os import sep
 from kivy.app import App
 from kivy.uix.settings import SettingsWithNoMenu, SettingTitle
 from kivy.uix.settings import SettingItem as SettingItemOriginal
@@ -10,6 +14,9 @@ from .scrollview import Scroller
 from .button import WideButton, WideToggle
 from .popup import NormalPopup, InputPopupContent
 from .filebrowser import FileBrowser
+from .recycleview import NormalRecycleView, SelectableRecycleBoxLayout, RecycleItemLabel
+from .label import ShortLabel
+from .button import NormalButton
 from .navigation import Navigation
 
 from kivy.lang.builder import Builder
@@ -146,6 +153,38 @@ Builder.load_string("""
         font_size: '15sp'
         color: app.theme.text
 
+<-SettingMultiPath>:
+    orientation: 'vertical'
+    label_size_hint_x: 0.66
+    size_hint: .25, None
+    height: labellayout.texture_size[1] + dp(10)
+
+    BoxLayout:
+        pos: root.pos
+        Widget:
+            size_hint_x: .2
+        BoxLayout:
+            canvas:
+                Color:
+                    rgba: 47 / 255., 167 / 255., 212 / 255., root.selected_alpha
+                Rectangle:
+                    pos: self.x, self.y + 1
+                    size: self.size
+                Color:
+                    rgb: .2, .2, .2
+                Rectangle:
+                    pos: self.x, self.y - 2
+                    size: self.width, 1
+            Label:
+                id: labellayout
+                markup: True
+                text: u"{0}\\n[size=13sp]{1}[/size]".format(root.title or "", root.value_formatted or "")
+                font_size: '15sp'
+                text_size: self.width - 32, None
+                color: app.theme.text
+        Widget:
+            size_hint_x: .2
+
 <SettingOptions>:
     Label:
         text: root.value or ''
@@ -161,7 +200,21 @@ Builder.load_string("""
         state: 'normal' if root.value == '0' else 'down'
         on_press: root.value = '0' if self.state == 'normal' else '1'
         text: root.true_text if root.value == '1' else root.false_text
+
+<MultiPathList>:
+    viewclass: 'RecycleItemLabel'
+    SelectableRecycleBoxLayout:
 """)
+
+
+def agnostic_path(path):
+    """Returns a path with the '/' separator instead of anything else."""
+    return str(path.replace('\\', '/'))
+
+
+def local_path(path):
+    """Formats a path string using separatorns appropriate for the os."""
+    return str(path.replace('/', sep))
 
 
 class SettingItem(SettingItemOriginal):
@@ -264,6 +317,113 @@ class SettingPath(SettingItem, Navigation):
         app.popup.open()
 
 
+class MultiPathList(NormalRecycleView):
+    pass
+
+
+class SettingMultiPath(SettingItem, Navigation):
+    """Widget for displaying and editing a multi-folder setting in the settings dialog.
+    Supports a popup widget to display an editable list of folders.
+    """
+
+    last_path = StringProperty()
+    popup = ObjectProperty(None, allownone=True)
+    filepopup = ObjectProperty(None, allownone=True)
+    textinput = ObjectProperty(None)
+    folderlist = ObjectProperty(None)
+    value = StringProperty('')
+    value_formatted = StringProperty('')
+
+    def on_value(self, instance, value):
+        self.value_formatted = ', '.join(self.value.split('\n'))
+        super().on_value(instance, value)
+
+    def remove_empty(self, elements):
+        return_list = []
+        for element in elements:
+            if element != '':
+                return_list.append(element)
+        return return_list
+
+    def on_panel(self, instance, value):
+        del instance
+        if value is None:
+            return
+        self.bind(on_release=self._create_popup)
+
+    def _dismiss(self, *_):
+        if self.popup:
+            self.popup.dismiss()
+        self.popup = None
+
+    def _create_popup(self, *_):
+        app = App.get_running_app()
+        content = BoxLayout(orientation='vertical')
+        self.popup = popup = NormalPopup(title=self.title, content=content, size_hint=(0.9, 0.9))
+        if not self.value:
+            content.add_widget(ShortLabel(height=app.button_scale * 3, text="No Folders Added"))
+            content.add_widget(BoxLayout())
+        else:
+            folders = filter(None, self.value.split('\n'))
+            folderdata = []
+            for folder in folders:
+                folderdata.append({'text': folder})
+            self.folderlist = folderlist = MultiPathList()
+            folderlist.data = folderdata
+            content.add_widget(folderlist)
+        buttons = BoxLayout(orientation='horizontal', size_hint=(1, None), height=app.button_scale)
+        addbutton = NormalButton(text='+')
+        addbutton.bind(on_release=self.add_path)
+        removebutton = NormalButton(text='-')
+        removebutton.bind(on_release=self.remove_path)
+        okbutton = WideButton(text='Save')
+        okbutton.bind(on_release=self._dismiss)
+        buttons.add_widget(addbutton)
+        buttons.add_widget(removebutton)
+        buttons.add_widget(okbutton)
+        content.add_widget(buttons)
+        popup.open()
+
+    def add_path(self, *_):
+        self.filechooser_popup()
+
+    def remove_path(self, *_):
+        listed_folders = self.folderlist.data
+        all_folders = []
+        for folder in listed_folders:
+            if folder != self.folderlist.children[0].selected:
+                all_folders.append(folder['text'])
+        self.value = u'\n'.join(all_folders)
+        self.refresh()
+
+    def refresh(self):
+        self._dismiss()
+        self._create_popup(self)
+
+    def filechooser_popup(self):
+        content = FileBrowser(select_text='Add', folder=self.last_path, folder_select=True, file_select=False, show_files=False)
+        content.bind(on_cancel=self.filepopup_dismiss)
+        content.bind(on_select=self.add_directory)
+        self.filepopup = filepopup = NormalPopup(title=self.title, content=content, size_hint=(0.9, 0.9))
+        filepopup.open()
+
+    def filepopup_dismiss(self, *_):
+        if self.filepopup:
+            self.filepopup.dismiss()
+        self.filepopup = None
+
+    def add_directory(self, *_):
+        if self.filepopup:
+            self.last_path = self.filepopup.content.folder
+            all_folders = self.value.split('\n')
+            all_folders.append(agnostic_path(self.filepopup.content.folder))
+            all_folders = self.remove_empty(all_folders)
+            all_folders = list(set(all_folders))
+            self.value = u'\n'.join(all_folders)
+            self.filepopup_dismiss()
+            self.refresh()
+
+
 class SettingString(SettingItem, Navigation):
     """String value in the settings screen.  Customizes the input popup"""
 
@@ -326,6 +486,7 @@ class AppSettings(SettingsWithNoMenu):
         self.register_type('options', SettingOptions)
         self.register_type('title', SettingTitle)
         self.register_type('path', SettingPath)
+        self.register_type('multipath', SettingMultiPath)
         self.register_type('numeric', SettingNumeric)
         self.register_type('aboutbutton', SettingAboutButton)
 

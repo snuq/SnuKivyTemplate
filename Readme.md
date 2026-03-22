@@ -669,4 +669,5 @@ Numeric Property, defaults to 10.  This is the number of pixels to apply roundin
 
 # snu.settings
 Fully themed settings screen that follows the colors of the rest of the app.
-Implements an 'aboutbutton' settings item that shows a button that opens the app's about popup.
+Implements an 'aboutbutton' settings item that shows a button that opens the app's about popup.  
+Implements a 'multipath' setting item that stores multiple paths in one value, and allows adding/removing individual paths.  
